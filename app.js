@@ -5,8 +5,14 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var passport = require('passport');//fbauth
-var session = require('express-session');//fbauth
+var passport = require('passport');//social auth
+var expressValidator = require('express-validator');
+var expressSession = require('express-session');
+var LocalStrategy = require('passport-local').Strategy
+var bcrypt = require('bcrypt');
+var jwt = require('jsonwebtoken');
+const pg = require('pg');
+const pg_ = new pg.Client(process.env.DATABASE_URL);
 
 
 
@@ -34,7 +40,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 /*-------Passport Configuration------*/
 
-app.use(session({
+app.use(expressValidator());
+app.use(expressSession({
 		secret:'secret_key_123ghj',
 		resave:false,
 		saveUninitialized:false
@@ -42,6 +49,10 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.use((req,res,next)=>{ //local
+res.locals.isAuthenticated = req.isAuthenticated();
+next();
+});
 
 var auth = express.Router();
 require('./app/routes/auth')(auth, passport);

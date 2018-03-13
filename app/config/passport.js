@@ -55,18 +55,54 @@ var GoCallback = (req,accessToken,refreshToken, profile, callback)=>{
 }
 
 
+var localCallback =	(username, password, done)=>{
+
+
+/*
+  	pg_.query('select id, pwd from users where uname=$1', [ username ],(err,res)=>{
+
+	if(err){ 
+		done(err) 
+	}else{
+
+  		if(res.rows.length === 0){
+  			done(null,false);
+  		}else{
+  		const hash = res.rows[0].pwd.toString();
+  		bcrypt.compare(password,hash, (err,resp)=>{
+
+  			if(resp === true){
+  				
+      		return done(null,{userid:res.rows[0].pwd.toString()});
+
+  			}else{
+  				
+  				return done(null, false);
+
+  			};
+
+  		});
+
+  		}
+
+  	}
+  		
+
+  	});*/
+   
+}
 
 passport.use(new FacebookStrategy(fbopt,fbCallback));
 passport.use(new GoogleStrategy(Gopt,GoCallback));
+passport.use('local.signin',new LocalStrategy(localCallback));
 
-	
-	
-
-
+  			
 
 
-	
-	
+
+		
+
+
 
 
 

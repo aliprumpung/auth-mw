@@ -1,116 +1,363 @@
-const pg = require('pg');
-const pg_ = new pg.Client(process.env.DATABASE_URL);
-pg_.connect();
-exports.insertTo = (tbl,fieldName,val)=>{
-// var str = ['nama','alamat','notelp','email']; 
-// var strVal = ['Joni','Jalan','0813144','higha@ahoo.com']; 
-// var ins = db.insertTo('user',str,strVal);
+  const pg = require('pg');
+  const pg_ = new pg.Client(process.env.DATABASE_URL);
+  pg_.connect();
+  exports.insertTo = (tbl,fieldName,val)=>{
+  // var str = ['nama','alamat','notelp','email']; 
+  // var strVal = ['Joni','Jalan','0813144','higha@ahoo.com']; 
+  // var ins = db.insertTo('user',str,strVal);
 
-	var str = '',strVal = '\'';
+  var str = '',strVal = '\'';
 
   for(var i=0;i<fieldName.length;i++){
-  	
-  	if (i < fieldName.length - 1){
-  	 str+= fieldName[i] + ',';
-  	}
-  
+
+  if (i < fieldName.length - 1){
+  str+= fieldName[i] + ',';
   }
-   for(var i=0;i<val.length;i++){
-  	
-  	if (i < val.length - 1){
-  	 strVal += val[i] + '\',\'';
-  	}else{
-  	 strVal += val[i] +'\''
-  	}
-  
+
   }
-  
+  for(var i=0;i<val.length;i++){
+
+  if (i < val.length - 1){
+  strVal += val[i] + '\',\'';
+  }else{
+  strVal += val[i] +'\''
+  }
+
+  }
+
   var q = `insert into ${tbl}(${fieldName}) values(${strVal});`;
   return q;
-}
-
-
-
-exports.insertTo_json = (tbl,myObject)=>{ 
-// var obj = { nama: '1', alamat: '2', notelp: '3'};
-// items.sort(); // sort the array of keys
-// items.forEach((item)=> {s += item + '=' + obj[item];});
-var items = Object.keys(myObject);
-var i=0, jsonkey ='', jsonval ='\'';
-
- items.forEach((item)=> {
-	if (i < Object.keys(myObject).length -1){
-	jsonkey += item + ',';
-	jsonval += myObject[item] + '\',\'';
-	}else{
-		jsonkey += item;
-		jsonval += myObject[item] +'\'';
-	}
-	i++;
- 	
- });
- var q = `insert into ${tbl} (${jsonkey}) values (${jsonval});`;
- //will return insert into user (nama,alamat,notelp) values ('1','2','3')
-  return q;
-}
-
-
-
-
-
-exports.createTbl_fromjson = (obj)=>{
-
-/*var obj ={
-  facebook: {
-    id: 'SERIAL primary key',
-    token: 'text',
-    email: 'text',
-    name: 'text'
-  },
-  Google: {
-    id: 'SERIAL primary key',
-    token: 'text',
-    email: 'text',
-    name: 'text'
   }
-}*/
-
-var a='';
-var items = Object.keys(obj);
- items.forEach((item)=> {
-var create_table = this.createTbl_json_(item,obj[item]); 
-a += create_table +'<br>'; 
- });
-return a;
-/*
-will return result
-CREATE TABLE facebook (id SERIAL primary key,token text,email text,name text);
-CREATE TABLE Google (id SERIAL primary key,token text,email text,name text);
-*/
-
-}
 
 
-exports.createTbl_json_ = (tbl,myObject)=>{ 
-var items = Object.keys(myObject);
-var i=0, jsonkey ='', jsonval ='\'';
 
- items.forEach((item)=> {
+
+
+
+
+  exports.exec_query = (opt,obj)=>{
+  var a='';
+  var items = Object.keys(obj);
+  items.forEach((item)=> {
+   
+  if(opt === 1){
+  var create_query = this.create_query(item,obj[item]); 
+  a += create_query +'<br>'; 
+
+  }else if(opt === 2){
+  var create_query = this.insert_query(item,obj[item]); 
+  a += create_query +'<br>'; 
+  }else if(opt === 3){
+  var create_query = this.update_query(item,obj[item]); 
+  a += create_query +'<br>'; 
+  }else if(opt === 4){
+  var create_query = this.delete_query(item,obj[item]); 
+  a += create_query +'<br>'; 
+  }
+  });
+
+  return a;
+
+  }
+
+
+  exports.create_query = (tbl,myObject)=>{ 
+  var items = Object.keys(myObject);
+  var i=0, jsonkey ='', jsonval ='\'',q='';
+
+  items.forEach((item)=> {
   if (i < Object.keys(myObject).length -1){
   jsonkey += item + ' ' + myObject[item] + ',';
-  
+
   }else{
   jsonkey += item + ' ' + myObject[item];
   }
   i++;
-  
- });
- var q = `CREATE TABLE ${tbl} (${jsonkey});`;
+
+  });
+
+  q = `CREATE TABLE ${tbl} (${jsonkey});`;
   return q;
-}
+  }
 
-exports.createTable = (tbl)=>{
 
-pg_.query(`create table ${tbl}`);
 
-}
+
+
+
+
+  exports.insert_query = (tbl,myObject)=>{ 
+  var items = Object.keys(myObject);
+  var i=0, jsonkey ='', jsonval ='\'';
+
+  items.forEach((item)=> {
+  if (i < Object.keys(myObject).length -1){
+  jsonkey += item + ',';
+  jsonval += myObject[item] + '\',\'';
+  }else{
+  jsonkey += item;
+  jsonval += myObject[item] +'\'';
+  }
+  i++;
+
+  });
+  var q = `insert into ${tbl} (${jsonkey}) values (${jsonval});`;
+  return q;
+  }
+
+
+
+  exports.update_query = (tbl,myObject)=>{ 
+  var items = Object.keys(myObject);
+  var i=0, jsonkey ='', jsonval ='\'',q='',key_W_AND ='';
+
+  items.forEach((item)=> {
+  if (i == 0){
+  whereid = item + `= \'${myObject[item]}\'`;
+  }else
+  if (item == 'where_AND'){
+
+  key_W_AND = where_parse(myObject[item],'and');
+
+  }else
+  if (item == 'where_OR'){
+
+  key_W_AND = where_parse(myObject[item],'or');
+
+  }else
+  if (i < Object.keys(myObject).length -2){
+  jsonkey += item + ' = \'' + myObject[item] + '\', ';
+
+  }else{
+  jsonkey += item + ' = \'' + myObject[item] + '\'';
+  }
+  i++;
+
+  });
+
+  q = `UPDATE ${tbl} SET ${jsonkey} WHERE ${key_W_AND};`;
+  return q;
+  }
+
+
+  exports.delete_query = (tbl,myObject)=>{ 
+
+  var key_W_AND='';
+  var items = Object.keys(myObject);
+  var i=0, jsonkey ='', jsonval ='\'',q='';
+
+  items.forEach((item)=> {
+  if (item == 'where_AND'){
+
+  key_W_AND = where_parse(myObject[item],'and');
+
+  } else
+  if (item == 'where_OR'){
+
+  key_W_AND = where_parse(myObject[item],'or');
+
+  } else
+
+  if (i < Object.keys(myObject).length -1){
+  jsonkey += item + ' ' + myObject[item] + ',';
+
+  }else{
+  jsonkey += item + ' ' + myObject[item];
+  }
+  i++;
+
+  });
+
+  q = `DELETE FROM ${tbl} WHERE ${key_W_AND};`;
+  return q;
+
+  }
+
+  const where_parse = (obj,and_or)=>{
+
+  var key_W_AND='';
+  var w_obj = obj;
+  var j=0;
+
+  var items_where = Object.keys(w_obj);
+
+  items_where.forEach((item)=> {
+
+  if (j < Object.keys(w_obj).length -1){
+  key_W_AND += item + ' = \'' + w_obj[item] + `\' ${and_or} `;
+
+  }else{
+
+  key_W_AND += item + ' = \'' + w_obj[item] + '\'';
+  }
+  j++;
+  });
+
+  return key_W_AND;
+  }
+
+
+exports.insert_raws_json = (obj)=>{
+
+var q='';
+var items = Object.keys(obj);
+  items.forEach((item)=> {
+
+    
+
+      var tbl = item;
+      for (var y=0;y<obj[item].length;y++){
+
+            var jsonkey ='';var jsonval ='\'';
+            var obj1 = obj[item][y];
+            var items1 = Object.keys(obj1);
+            
+          
+            var i=0;
+            items1.forEach((item1)=> {
+
+                  if(i < items1.length -1){
+
+                    jsonkey += item1 + `,`;
+                    jsonval += obj1[item1] + '\',\'';
+
+                  }else{
+                    jsonkey += item ;
+                    jsonval += obj1[item1] + `\'`;
+                  }
+              
+            i++;
+            });
+              
+            q +=`insert into ${tbl} (${jsonkey}) values( ${jsonval});<br>`;
+            
+    
+
+      
+
+      }
+
+
+  });
+
+
+
+
+ return q;
+  };
+
+  /*
+
+  1. create table example
+  var myObject ={
+  users: {
+    id: 'SERIAL primary key',
+    email: 'text',
+    name: 'text',
+    password: 'text',
+    sesion: 'text'
+  },
+  facebook: {
+    id: 'SERIAL primary key',
+    email: 'text',
+    name: 'text',
+    password: 'text',
+    sesion: 'text'
+  }
+  }
+  var str_Results = db.exec_query(1,myObject);
+
+  res.send(str_Results);
+
+  2. insert table example
+  var myObject ={
+  users: {
+    id: 'SERIAL primary key',
+    email: 'text',
+    name: 'text',
+    password: 'text',
+    sesion: 'text'
+  },
+  facebook: {
+    id: 'SERIAL primary key',
+    email: 'text',
+    name: 'text',
+    password: 'text',
+    sesion: 'text'
+  }
+  }
+  var str_Results = db.exec_query(2,myObject);
+
+  res.send(str_Results);
+
+  3. update table example
+
+  var myObject_1 ={
+  users: {
+    id: 'SERIAL primary key',
+    email: 'text',
+    name: 'text',
+    password: 'text',
+    sesion: 'text',
+    where_AND:{
+      id:'2',nama:'ALI'
+    }
+  }
+  
+  }
+
+  var str_Results = db.exec_query(3,myObject);
+
+  res.send(str_Results);
+
+  4. delete table example
+
+  var myObject_2 ={
+  users: {
+    where_OR:{
+      id:'2'
+    }
+  }
+  }
+  
+  var str_Results = db.exec_query(4,myObject);
+
+  res.send(str_Results);
+
+
+
+  5. insert multirows
+
+  var myObject ={
+  users: [{
+    id: 'SERIAL',
+    email: 'text',
+    name: 'text',
+    password: 'text',
+    sesion: 'text'
+  },{
+    id: 'SERIAL',
+    email: 'text',
+    name: 'text',
+    password: 'text',
+    sesion: 'text'
+  },{
+    id: 'SERIAL',
+    email: 'text',
+    name: 'text',
+    password: 'text',
+    sesion: 'text'
+  }]
+  }
+
+  var str_Results = db.insert_raws_json(myObject);
+  res.send(str_Results);
+
+
+
+
+
+
+
+
+  */
