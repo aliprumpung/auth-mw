@@ -68,12 +68,12 @@ exports.exec_query = (opt,obj)=>{
 
   });  
 
-  // return a;
+   // return a;
 
-}
+ }
 
 
-exports.create_query = (tbl,myObject)=>{ 
+ exports.create_query = (tbl,myObject)=>{ 
   var items = Object.keys(myObject);
   var i=0, jsonkey ='', jsonval ='\'',q='';
 
@@ -91,8 +91,6 @@ exports.create_query = (tbl,myObject)=>{
   q = `CREATE TABLE ${tbl} (${jsonkey});`;
   return q;
 }
-
-
 
 
 
@@ -247,7 +245,7 @@ exports.insert_multirows_json = (obj)=>{
 
 
 
-     
+      
 
     }
 
@@ -255,15 +253,15 @@ exports.insert_multirows_json = (obj)=>{
   });
  // return q;
 
-  return new Promise((resolve,reject)=>{
-    pg_.query(q,(err,res)=>{
-      if(err){
-        reject(err);
-      }else{
-        resolve(res);
-      }
-    });
+ return new Promise((resolve,reject)=>{
+  pg_.query(q,(err,res)=>{
+    if(err){
+      reject(err);
+    }else{
+      resolve(res);
+    }
   });
+});
 
 
 };
@@ -386,17 +384,17 @@ exports.check_ifExistsInDB = (myObject,arg,cb)=>{
 
 
 exports.rem_attrFromJSON = (obj,attr)=>{
-for(var i=0;i<obj.length;i++){
-delete obj[i][attr];
-}
+  for(var i=0;i<obj.length;i++){
+    delete obj[i][attr];
+  }
 }
 
 
 exports.filter_JSON = (myObj,attr,str)=>{
-var newArray = myObj.filter((el) =>{
-  return el[attr] == str;
-});
-return newArray;
+  var newArray = myObj.filter((el) =>{
+    return el[attr] == str;
+  });
+  return newArray;
 }
 
 
