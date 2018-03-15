@@ -78,12 +78,12 @@ var myObject ={
 
 db.check_ifExistsInDB(myObject,'email',(err,pos)=>{
 
-	var rdup = db.removes_duplicatesJSON(pos);
-	console.log(pos);
+	/*var rdup = db.removes_duplicatesJSON(pos);
+	console.log(rdup);
 	var newArray = db.filter_JSON(rdup,'exists','0');
-	db.rem_attrFromJSON(newArray,'exists');
+	db.rem_attrFromJSON(newArray,'exists');*/
 
-	res.send(newArray);
+	res.send(pos);
 	
 
 });
@@ -126,7 +126,7 @@ db.check_ifExistsInDB(myObject,'email',(err,pos)=>{
 
 
 
-
+/*
 router.get('/test1',(req,res,next)=>{
 	var myObj = [ { "email": "hes@gmail.com", "name": "Ali", "password": "1232456", "sesion": "sss", "exists": "1" },
 	 { "email": "Jojo@gmail.com", "name": "Ali Prumpung", "password": "123245cccc6", "sesion": "dddsss", "exists": "0" },
@@ -164,6 +164,6 @@ const insert_data = (tbl,key,val,myObject,cb)=>{
 
 }
 
-
+*/
 module.exports = router;
 

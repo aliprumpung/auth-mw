@@ -1,6 +1,6 @@
   const pg = require('pg');
   const pg_ = new pg.Client(process.env.DATABASE_URL);
-  var isEqual = require('lodash.isequal');
+  const isEqual = require('lodash.isequal');
   pg_.connect();
   exports.insertTo = (tbl,fieldName,val)=>{
   // var str = ['nama','alamat','notelp','email']; 
