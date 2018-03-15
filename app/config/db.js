@@ -209,7 +209,7 @@ const where_parse = (obj,and_or)=>{
 }
 
 
-exports.insert_rows_json = (obj)=>{
+exports.insert_multirows_json = (obj)=>{
 
   var q='';
   var items = Object.keys(obj);
@@ -247,13 +247,13 @@ exports.insert_rows_json = (obj)=>{
 
 
 
-      
+     
 
     }
 
 
   });
-
+ // return q;
 
   return new Promise((resolve,reject)=>{
     pg_.query(q,(err,res)=>{
@@ -504,7 +504,7 @@ return newArray;
   }]
   }
 
-  var str_Results = db.insert_raws_json(myObject);
+  var str_Results = db.insert_rows_json(myObject);
   res.send(str_Results);
 
 

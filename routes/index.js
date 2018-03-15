@@ -23,51 +23,6 @@ router.get('/test', function(req, res, next) {
 
 
 // var str_Results = db.exec_query(2,myObject);
-// var str_Results = db.insert_rows_json(myObject);
-// res.send(str_Results);
-
-
-
-var myObject ={
-	users: [{
-		email: 'hes@gmail.com',
-		name: 'Ali',
-		password: '1232456',
-		sesion: 'sss'
-	},{
-		email: 'Jojo@gmail.com',
-		name: 'Ali Prumpung',
-		password: '123245cccc6',
-		sesion: 'dddsss'
-	},{
-		email: 'jojo@gmail.com',
-		name: 'Ali Prumpung',
-		password: '123245cccc6',
-		sesion: 'dddsss'
-	},{
-		email: 'jEje@gmail.com',
-		name: 'Ali P',
-		password: '123245cccc6',
-		sesion: 'dddsss'
-	}]
-}
-
-
-
-
-db.check_ifExistsInDB(myObject,'email',(err,pos)=>{
-
-	var rdup = db.removes_duplicatesJSON(pos);
-	var newArray = db.filter_JSON(rdup,'exists','0');
-	db.rem_attrFromJSON(newArray,'exists');
-
-	res.send(newArray);
-	
-
-});
-
-
-
 
 
 
@@ -104,46 +59,6 @@ db.check_ifExistsInDB(myObject,'email',(err,pos)=>{
 
 
 
-/*
-router.get('/test1',(req,res,next)=>{
-	var myObj = [ { "email": "hes@gmail.com", "name": "Ali", "password": "1232456", "sesion": "sss", "exists": "1" },
-	 { "email": "Jojo@gmail.com", "name": "Ali Prumpung", "password": "123245cccc6", "sesion": "dddsss", "exists": "0" },
-	  { "email": "jEje@gmail.com", "name": "Ali P", "password": "123245cccc6", "sesion": "dddsss", "exists": "0" } ]
-
-
-
-var newArray = db.filter_JSON(myObj,'exists','1');
-db.rem_attrFromJSON(newArray,'exists');
-
-res.send(newArray);
-
-
-});
-          
-
-            	 
-
-
-
-
-
-
-
-
-
-
-const insert_data = (tbl,key,val,myObject,cb)=>{
-	
-	db.ifDoesntExists(tbl,`${key} = \'${val}\'`).then(pos=>{		
-		return db.insert_rows_json(myObject);
-	}).then(pos=>{
-		cb(pos.rows,true);
-	}).catch(err=>{ cb(err,false); });
-
-}
-
-*/
-
 
 router.get('/createtbl',(req,res,next)=>{
 
@@ -169,5 +84,126 @@ router.get('/createtbl',(req,res,next)=>{
   	res.status(409).json({errorMsg:err.message});
   });
 });
+
+
+router.get('/inserttbl_duplicate',(req,res,next)=>{
+
+ var myObject ={
+  users: [{
+    email: 'hayoo@gmail.com',
+    name: 'Joni',
+    password: '12432',
+    sesion: 'blablabla'
+  },{
+    email: 'yes@gmai.com',
+    name: 'jono',
+    password: '-098',
+    sesion: 'cjxklz'
+  },{
+    email: 'cihy@gmail.com',
+    name: 'jonoooo',
+    password: '489302',
+    sesion: 'ncxmee'
+  }]
+  }
+
+  // duplicatable way
+  db.insert_multirows_json(myObject).then(pos=>{
+ res.send(pos);
+  }).catch(err=>{
+  	 res.send(err.message);
+  });
+ 
+});
+
+
+
+
+router.get('/inserttbl_noduplicate',(req,res,next)=>{
+
+var myObject ={
+	users: [{
+		email: 'hes@gmail.com',
+		name: 'Ali',
+		password: '1232456',
+		sesion: 'sss'
+	},{
+		email: 'Jojo@gmail.com',
+		name: 'Ali Prumpung',
+		password: '123245cccc6',
+		sesion: 'dddsss'
+	},{
+		email: 'jojo@gmail.com',
+		name: 'Ali Prumpung',
+		password: '123245cccc6',
+		sesion: 'dddsss'
+	},{
+		email: 'jEje@gmail.com',
+		name: 'Ali P',
+		password: '123245cccc6',
+		sesion: 'dddsss'
+	}]
+}
+
+
+
+
+db.check_ifExistsInDB(myObject,'email',(err,pos)=>{
+
+	var result = {}
+	var rdup = db.removes_duplicatesJSON(pos);
+	var newArray = db.filter_JSON(rdup,'exists','0');
+	db.rem_attrFromJSON(newArray,'exists');
+	result['users'] = newArray;
+	
+
+
+	db.insert_multirows_json(result).then(pos=>{
+	res.send(pos);
+	}).catch(err=>{
+	res.send(err.message);
+	});
+
+});
+
+
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 module.exports = router;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
