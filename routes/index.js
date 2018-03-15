@@ -61,7 +61,7 @@ db.check_ifExistsInDB(myObject,'email',(err,pos)=>{
 	var newArray = db.filter_JSON(rdup,'exists','0');
 	db.rem_attrFromJSON(newArray,'exists');
 
-	res.send(pos);
+	res.send(newArray);
 	
 
 });
