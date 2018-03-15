@@ -28,27 +28,6 @@ router.get('/test', function(req, res, next) {
 
 
 
- // var myObject ={
- //  users: {
- //    id: 'SERIAL primary key',
- //    email: 'text',
- //    name: 'text',
- //    password: 'text',
- //    sesion: 'text'
- //  },
- //  facebook: {
- //    id: 'SERIAL primary key',
- //    email: 'text',
- //    name: 'text',
- //    sesion: 'text'
- //  }
- //  }
-
-  // db.exec_query(1,myObject).then(pos=>{
-  // 	res.status(200).json({message:pos});
-  // }).catch(err=>{
-  // 	res.status(409).json({errorMsg:err.message});
-  // });
 var myObject ={
 	users: [{
 		email: 'hes@gmail.com',
@@ -165,5 +144,31 @@ const insert_data = (tbl,key,val,myObject,cb)=>{
 }
 
 */
+
+
+router.get('/createtbl',(req,res,next)=>{
+	
+ var myObject ={
+  users: {
+    id: 'SERIAL primary key',
+    email: 'text',
+    name: 'text',
+    password: 'text',
+    sesion: 'text'
+  },
+  facebook: {
+    id: 'SERIAL primary key',
+    email: 'text',
+    name: 'text',
+    sesion: 'text'
+  }
+  }
+
+  db.exec_query(1,myObject).then(pos=>{
+  	res.status(200).json({message:pos});
+  }).catch(err=>{
+  	res.status(409).json({errorMsg:err.message});
+  });
+});
 module.exports = router;
 
