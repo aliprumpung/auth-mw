@@ -80,8 +80,8 @@ db.check_ifExistsInDB(myObject,'email',(err,pos)=>{
 
 	var rdup = db.removes_duplicatesJSON(pos);
 	console.log(pos);
-	var newArray = filter_JSON(rdup,'exists','0');
-	rem_attrFromJSON(newArray,'exists');
+	var newArray = db.filter_JSON(rdup,'exists','0');
+	db.rem_attrFromJSON(newArray,'exists');
 
 	res.send(newArray);
 	
