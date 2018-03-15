@@ -57,10 +57,9 @@ var myObject ={
 
 db.check_ifExistsInDB(myObject,'email',(err,pos)=>{
 
-	/*var rdup = db.removes_duplicatesJSON(pos);
-	console.log(rdup);
+	var rdup = db.removes_duplicatesJSON(pos);
 	var newArray = db.filter_JSON(rdup,'exists','0');
-	db.rem_attrFromJSON(newArray,'exists');*/
+	db.rem_attrFromJSON(newArray,'exists');
 
 	res.send(pos);
 	
@@ -147,7 +146,7 @@ const insert_data = (tbl,key,val,myObject,cb)=>{
 
 
 router.get('/createtbl',(req,res,next)=>{
-	
+
  var myObject ={
   users: {
     id: 'SERIAL primary key',
