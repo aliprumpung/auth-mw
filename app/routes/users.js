@@ -1,4 +1,8 @@
+
 const mw = require('../middleWare/index');
+var bcrypt = require('../config/bcrypt');
+var db = require('../config/db');
+const saltRounds = 10;
 module.exports =  function(router, passport){
 
 
@@ -13,7 +17,7 @@ router.get('/login',mw.middleWareAuth, function(req, res, next) {
 
 router.post('/login',passport.authenticate('signin',{
 	successRedirect:'/',
-	failureRedirect:'/login'
+	failureRedirect:'/users/login'
 }));
 
 router.get('/logout', function(req, res){
@@ -46,35 +50,103 @@ router.post('/signup', (req, res, next)=> {
 
 	}else{
 		req.session.success = true;
-		var password = req.body.password;
+		
 
 
+
+var email = req.body.email;
+var username = req.body.username;
+var password = req.body.password;
+var session = req.session;
+
+
+bcrypt.hashingPwd(password,saltRounds).then(hash=>{
+   
+ 	var myObject = {
+ 		users: [{
+ 			email:email,
+ 			name:username,
+ 			password:hash,
+ 			sesion:session
+ 		}]}
+
+ 
+	
+
+	db.check_ifExistsInDB(myObject,'email',(err,pos)=>{
+ 
+		var result = {}
+		var rdup = db.removes_duplicatesJSON(pos);
+		var newArray = db.filter_JSON(rdup,'exists','0');
+		db.rem_attrFromJSON(newArray,'exists');
+		
+		var count = newArray.length.toString();
+		
+		if (Number(count) > 0){
+			result['users'] = newArray;
+
+			db.insert_multirows_json(result).then(pos=>{
+			req.login(username , function(err) {
+				console.log(req.username);
+					res.redirect('/');
+				});
+			}).catch(error=>{
+			res.status(500).json({errMsg:error});
+			});
+
+		}else{
+			res.status(500).json({errMsg:'Email already existed.'});
+		}
+		
+	});
+
+
+}).catch(err=>{ res.status(500).json({errMsg:err}); });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
 		bcrypt.hash(password,saltRounds,(error,hash)=>{
 			var data = {
 				uname: req.body.username,
 				pwd:hash
 			}
-			// var last_id = '';
-			// findOneUsr(data).then(res=>{
-			// 	return insertUser(data);
-			// }).then(res=>{
-			// 	last_id = res;
+			var last_id = '';
+			findOneUsr(data).then(res=>{
+				return insertUser(data);
+			}).then(res=>{
+				last_id = res;
 
-			// 	return getUsers();
-			// }).then(pos=>{
+				return getUsers();
+			}).then(pos=>{
 
-			// 	/*setting passport */
-			// 	req.login(last_id , function(err) {
+				setting passport 
+				req.login(last_id , function(err) {
 
-			// 		res.redirect('/login');
-			// 	});
+					res.redirect('/login');
+				});
 
-			// }).catch(err=>{req.session.destroy();res.render('index', {username:req.body.username, title:'Registration form',errors: err.message });});
+			}).catch(err=>{req.session.destroy();res.render('index', {username:req.body.username, title:'Registration form',errors: err.message });});
 
 
 
 		});
-
+*/
 
 
 	}

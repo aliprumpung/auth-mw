@@ -1,42 +1,14 @@
+  require('dotenv').config();
   const pg = require('pg');
   const pg_ = new pg.Client(process.env.DATABASE_URL);
   const isEqual = require('lodash.isequal');
   pg_.connect();
-  exports.insertTo = (tbl,fieldName,val)=>{
-  // var str = ['nama','alamat','notelp','email']; 
-  // var strVal = ['Joni','Jalan','0813144','higha@ahoo.com']; 
-  // var ins = db.insertTo('user',str,strVal);
-
-  var str = '',strVal = '\'';
-
-  for(var i=0;i<fieldName.length;i++){
-
-    if (i < fieldName.length - 1){
-      str+= fieldName[i] + ',';
-    }
-
-  }
-  for(var i=0;i<val.length;i++){
-
-    if (i < val.length - 1){
-      strVal += val[i] + '\',\'';
-    }else{
-      strVal += val[i] +'\''
-    }
-
-  }
-
-  var q = `insert into ${tbl}(${fieldName}) values(${strVal});`;
-  return q;
-}
+ 
 
 
 
+  exports.exec_query = (opt,obj)=>{
 
-
-
-
-exports.exec_query = (opt,obj)=>{
   var a='';
   var items = Object.keys(obj);
   items.forEach((item)=> {
@@ -226,10 +198,7 @@ exports.insert_multirows_json = (obj)=>{
       var i=0;
       items1.forEach((item1)=> {
 
-
-
         if(i < items1.length -1){
-
           jsonkey += item1 + `,`;
           jsonval += obj1[item1] + '\',\'';
 
@@ -241,11 +210,8 @@ exports.insert_multirows_json = (obj)=>{
         i++;
       });
 
-      q +=`insert into ${tbl} (${jsonkey}) values (${jsonval})returning ${jsonkey};`;
-
-
-
-      
+      q +=`insert into ${tbl} (${jsonkey}) values (${jsonval});`;
+  
 
     }
 
@@ -272,18 +238,20 @@ exports.insert_multirows_json = (obj)=>{
 
 exports.ifExists = (tbl,obj,condition)=>{ 
 
-  var q = `select email from ${tbl} where ${condition};`;
-
+  var q = `select * from ${tbl} where ${condition};`;
+   
   var data = obj;
 
   return new Promise((resolve,reject)=>{
     pg_.query(q,(err,res)=>{
       if(err){
+
         reject(err);
       }else{
 
         if(res.rows.length > 0){
           data.exists = '1';
+          data.password = res.rows[0].password;
           resolve(data);
           
         }else{
@@ -318,6 +286,41 @@ exports.ifDoesntExists = (tbl,condition)=>{
     });
   });
 }
+
+
+
+exports.check_ifExistsInDB = (myObject,arg,cb)=>{
+
+  let keys = '';   var results = [];
+
+  var items = Object.keys(myObject);
+  items.forEach((item)=> {
+
+
+
+   for (var y=0;y<myObject[item].length;y++){
+
+
+    var q=`${arg} = \'${myObject[item][y][arg]}\'`;
+
+  
+    this.ifExists(item,myObject[item][y],q).then(pos=>{
+
+      results.push(pos);
+      
+    }).catch(err=>{
+       console.log(err);
+      results.push(err);
+      
+    });
+
+  }
+});
+  setTimeout(function () {
+    cb(null,results);},1000);
+  
+}
+
 exports.rem_dataFrom = (tbl,condition)=>{ 
 
   var q = `delete from ${tbl} where ${condition};`;
@@ -348,40 +351,6 @@ exports.removes_duplicatesJSON = (arr)=> {
   });
   return cleaned;
 }
-
-
-
-
-
-exports.check_ifExistsInDB = (myObject,arg,cb)=>{
-  let keys = '';   var results = [];
-
-  var items = Object.keys(myObject);
-  items.forEach((item)=> {
-
-
-
-   for (var y=0;y<myObject[item].length;y++){
-
-
-    var q=`${arg} = \'${myObject[item][y][arg]}\'`;
-    
-    this.ifExists('users',myObject[item][y],q).then(pos=>{
-
-      results.push(pos);
-      
-    }).catch(err=>{
-      results.push(err);
-      
-    });
-
-  }
-});
-  setTimeout(function () {
-    cb(null,results);},1000);
-  
-}
-
 
 exports.rem_attrFromJSON = (obj,attr)=>{
   for(var i=0;i<obj.length;i++){

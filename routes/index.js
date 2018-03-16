@@ -6,11 +6,17 @@ var passport = require('passport');//fbauth
 var social = require('../app/config/passport')(passport);
 const mw = require('../app/middleWare/index');
 var db = require('../app/config/db');
+var bcrypt = require('../app/config/bcrypt');
+const saltRounds = 10;
 
+
+module.exports =  function(router, passport){
 
 router.get('/',mw.isAuthenticated, function(req, res, next) {
-	res.render('index', { title: 'Hello from index'});
+res.send(req.user.email);
+
 });
+
 
 router.get('/create',(req,res,next)=>{
 
@@ -20,13 +26,13 @@ router.get('/create',(req,res,next)=>{
 			email: 'text',
 			name: 'text',
 			password: 'text',
-			sesion: 'text'
+			session: 'text'
 		},
 		facebook: {
 			id: 'SERIAL primary key',
 			email: 'text',
 			name: 'text',
-			sesion: 'text'
+			session: 'text'
 		}
 	}
 
@@ -72,32 +78,24 @@ router.get('/insert_dupl',(req,res,next)=>{
 
 
 router.get('/insert_nodupl',(req,res,next)=>{
+	
+var email = 'herokugit@gmail.com';
+var name = 'Ali';
+var password = 'hash1234567';
+var session = 'sss';
 
+bcrypt.hashingPwd(password,saltRounds).then(hash=>{
+   
+ 	
+	// var myObject ={users: [{email: email,name: name,password: hash,sesion: session}]}
 	var myObject ={
 		users: [{
-			email: 'hes@gmail.com',
-			name: 'Ali',
-			password: '1232456',
-			sesion: 'sss'
-		},{
-			email: 'Jojo@gmail.com',
-			name: 'Ali Prumpung',
-			password: '123245cccc6',
-			sesion: 'dddsss'
-		},{
-			email: 'jojo@gmail.com',
-			name: 'Ali Prumpung',
-			password: '123245cccc6',
-			sesion: 'dddsss'
-		},{
-			email: 'jEje@gmail.com',
-			name: 'Ali P',
-			password: '123245cccc6',
-			sesion: 'dddsss'
+			email: 'hayoo@gmail.com',
+			name: 'Joni',
+			password: hash,
+			sesion: 'blablabla'
 		}]
 	}
-
-
 
 
 	db.check_ifExistsInDB(myObject,'email',(err,pos)=>{
@@ -106,21 +104,29 @@ router.get('/insert_nodupl',(req,res,next)=>{
 		var rdup = db.removes_duplicatesJSON(pos);
 		var newArray = db.filter_JSON(rdup,'exists','0');
 		db.rem_attrFromJSON(newArray,'exists');
-		result['users'] = newArray;
+		
+		var count = newArray.length.toString();
+		
+		if (Number(count) > 0){
+			result['users'] = newArray;
 
+			db.insert_multirows_json(result).then(pos=>{
+			res.status(200).json({status:'ok',message:'success..'});
+			}).catch(error=>{
+			res.status(500).json({errMsg:error});
+			});
 
-
-		db.insert_multirows_json(result).then(pos=>{
-			res.send(pos);
-		}).catch(err=>{
-			res.send(err.message);
-		});
-
+		}else{
+			res.status(500).json({errMsg:'Email already existed.'});
+		}
+		
 	});
 
 
-});
+}).catch(err=>{ res.status(500).json({errMsg:err}); });
 
+
+});
 
 
 router.get('/edit',(req,res,next)=>{
@@ -170,12 +176,11 @@ router.get('/delete',(req,res,next)=>{
 
 
 
-module.exports = router;
 
 
 
 
-
+}
 
 
 

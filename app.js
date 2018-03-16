@@ -11,12 +11,10 @@ var expressSession = require('express-session');
 var LocalStrategy = require('passport-local').Strategy
 var bcrypt = require('bcrypt');
 var jwt = require('jsonwebtoken');
-const pg = require('pg');
-const pg_ = new pg.Client(process.env.DATABASE_URL);
 
 
 
-var index = require('./routes/index');
+// var index = require('./routes/index');
 
 
 var app = express();
@@ -61,9 +59,15 @@ app.use('/auth', auth);
 var users = express.Router();
 require('./app/routes/users')(users, passport);
 app.use('/users', users);
+
+var index = express.Router();
+require('./routes/index')(index, passport);
+app.use('/', index);
+
+
 /*-------Passport Configuration------*/
 
-app.use('/', index);
+// app.use('/', index);
 
 
 
