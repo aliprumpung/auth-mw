@@ -79,7 +79,14 @@ app.use('/', index);
 // app.use('/', index);
 
 
+/*-------api Configuration------*/
 
+var api = express.Router();
+require('./api/v1/index')(api, passport);
+app.use('/api/v1', api);
+
+
+/*-------api Configuration------*/
 
 
 

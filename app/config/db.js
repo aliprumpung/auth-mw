@@ -374,6 +374,22 @@ exports.rem_dataFrom = (tbl,condition)=>{
    });
   });
 }
+exports.check_sKEY = (fld,tbl,condition)=>{ 
+
+  var q = `select ${fld} from ${tbl} where ${fld} = \'${condition}\';`;
+
+
+  return new Promise((resolve,reject)=>{
+    pg_.query(q,(err,res)=>{
+      if(err){
+        reject(err);
+      }else{
+       resolve(res);
+
+     }
+   });
+  });
+}
 
 exports.removes_duplicatesJSON = (arr)=> {
   var cleaned = [];
@@ -437,7 +453,8 @@ exports.create_usersTbl = ()=>{
    "active" boolean,
    "rand" varchar,
    "created_at" timestamp(6),
-   "last_login" timestamp(6)
+   "last_login" timestamp(6),
+   "shared_k" varchar
 )
 WITH (OIDS=FALSE);
 ALTER TABLE "users" ADD CONSTRAINT "users_pkey" PRIMARY KEY ("u_id") 
