@@ -123,8 +123,8 @@ module.exports =  function(router, passport){
 									}
 									
 									nodemailer.mail(mailOptions);
-									// res.status(200).json({msg:'We have sent an email with a confirmation link to your email address. Please allow 5-10 minutes for this message to arrive.'});
-									res.send('<a href='+link+'>Click here to verify</a>');
+									 res.status(200).json({msg:'We have sent an email with a confirmation link to your email address. Please allow 5-10 minutes for this message to arrive.'});
+									// res.send('<a href='+link+'>Click here to verify</a>');
 									/*req.login(username , function(err) {
 
 										res.redirect('/users');
