@@ -1,4 +1,4 @@
-
+require('dotenv').config();
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
@@ -7,11 +7,12 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var passport = require('passport');//social auth
 var expressValidator = require('express-validator');
-var expressSession = require('express-session');
+var pg = require('pg');
+var session = require('express-session');
+var pgStore = require('connect-pg-simple')(session);
 var LocalStrategy = require('passport-local').Strategy
 var bcrypt = require('bcrypt');
 var jwt = require('jsonwebtoken');
-
 
 
 // var index = require('./routes/index');
@@ -39,10 +40,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 /*-------Passport Configuration------*/
 
 app.use(expressValidator());
-app.use(expressSession({
-		secret:'secret_key_123ghj',
-		resave:false,
-		saveUninitialized:false
+app.use(session({
+		saveUninitialized:false,
+    secret: process.env.FOO_COOKIE_SECRET,
+    store: new pgStore({ conString: process.env.DATABASE_URL,ttl:(1*5*5),tableName:'user_sessions'}),
+    resave: false ,
+    // cookie: { maxAge: 180 * 60 * 1000 },
+    name: "id"
 	}));
 app.use(passport.initialize());
 app.use(passport.session());
@@ -51,6 +55,11 @@ app.use((req,res,next)=>{ //local
 res.locals.isAuthenticated = req.isAuthenticated();
 next();
 });
+
+// app.use(function(req, res, next) {
+// res.locals.session = req.session;
+// next();
+// });
 
 var auth = express.Router();
 require('./app/routes/auth')(auth, passport);
@@ -68,9 +77,6 @@ app.use('/', index);
 /*-------Passport Configuration------*/
 
 // app.use('/', index);
-
-
-
 
 
 

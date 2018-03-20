@@ -29,18 +29,18 @@
     }
   });
   return new Promise((resolve,reject)=>{
-    console.log(a);
+ 
     pg_.query(a,(err,res)=>{
       if(err){
         reject(err);
       }else{
-        resolve('query executed.');
+        resolve(obj);
       }
     });
 
   });  
 
-   // return a;
+    // return a;
 
  }
 
@@ -94,8 +94,13 @@ exports.update_query = (tbl,myObject)=>{
   var i=0, jsonkey ='', jsonval ='\'',q='',key_W_AND ='';
 
   items.forEach((item)=> {
+    if (Object.keys(myObject).length == 2){
+     
+
     if (i == 0){
-      whereid = item + `= \'${myObject[item]}\'`;
+     
+      jsonkey += item + `= \'${myObject[item]}\' `;
+
     }else
     if (item == 'where_AND'){
 
@@ -113,6 +118,36 @@ exports.update_query = (tbl,myObject)=>{
     }else{
       jsonkey += item + ' = \'' + myObject[item] + '\'';
     }
+
+
+
+
+    }else{
+
+      if (i == 0){
+     
+      jsonkey += item + `= \'${myObject[item]}\', `;
+
+    }else
+    if (item == 'where_AND'){
+
+      key_W_AND = where_parse(myObject[item],'and');
+
+    }else
+    if (item == 'where_OR'){
+
+      key_W_AND = where_parse(myObject[item],'or');
+
+    }else
+    if (i < Object.keys(myObject).length -2){
+      jsonkey += item + ' = \'' + myObject[item] + '\', ';
+
+    }else{
+      jsonkey += item + ' = \'' + myObject[item] + '\'';
+    }
+
+    }
+    
     i++;
 
   });
@@ -252,6 +287,8 @@ exports.ifExists = (tbl,obj,condition)=>{
         if(res.rows.length > 0){
           data.exists = '1';
           data.password = res.rows[0].password;
+          data.active = res.rows[0].active;
+          data.rand = res.rows[0].rand;
           resolve(data);
           
         }else{
@@ -309,7 +346,7 @@ exports.check_ifExistsInDB = (myObject,arg,cb)=>{
       results.push(pos);
       
     }).catch(err=>{
-       console.log(err);
+      
       results.push(err);
       
     });
@@ -365,7 +402,69 @@ exports.filter_JSON = (myObj,attr,str)=>{
   });
   return newArray;
 }
+exports.snfindOne = (id, callback)=>{
 
+var returningUser = false;
+var sql = 'SELECT * FROM users WHERE token = $1';
+    var data = [
+        id
+    ];
+
+
+}
+exports.create_sessionTbl = ()=>{
+  const q =`CREATE TABLE IF NOT EXISTS "user_sessions" (
+   "sid" varchar NOT NULL COLLATE "default",
+   "sess" json NOT NULL,
+   "expire" timestamp(6) NOT NULL
+)
+WITH (OIDS=FALSE);
+ALTER TABLE "user_sessions" ADD CONSTRAINT "session_pkey" PRIMARY KEY ("sid") 
+NOT DEFERRABLE INITIALLY IMMEDIATE;`;
+return new Promise((resolve,reject)=>{
+    pg_.query(q,(err,res)=>{
+      if(err){
+        reject(err);
+      }else{
+       resolve(res);
+
+     }
+   });
+  });
+
+}
+
+exports.create_usersTbl = ()=>{
+  const q =`CREATE TABLE IF NOT EXISTS "users" (
+   "u_id" SERIAL,
+   "name" varchar NOT NULL,
+   "email" varchar NOT NULL UNIQUE,
+   "password" varchar NOT NULL,
+   "account_type" varchar NOT NULL,
+   "profile_id" varchar ,
+   "token" varchar ,
+   "active" boolean,
+   "rand" varchar,
+   "created_at" timestamp(6),
+   "last_login" timestamp(6)
+)
+WITH (OIDS=FALSE);
+ALTER TABLE "users" ADD CONSTRAINT "users_pkey" PRIMARY KEY ("u_id") 
+NOT DEFERRABLE INITIALLY IMMEDIATE;
+ALTER TABLE "users" ALTER COLUMN active
+SET DEFAULT 'false';`;
+return new Promise((resolve,reject)=>{
+    pg_.query(q,(err,res)=>{
+      if(err){
+        reject(err);
+      }else{
+       resolve(res);
+
+     }
+   });
+  });
+
+}
 
   /*
 
