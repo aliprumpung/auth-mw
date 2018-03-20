@@ -435,7 +435,7 @@ return new Promise((resolve,reject)=>{
 }
 
 exports.create_usersTbl = ()=>{
-  const q =`CREATE TABLE IF NOT EXISTS "users" (
+  const q =`DROP TABLE IF EXISTS users;CREATE TABLE IF NOT EXISTS "users" (
    "u_id" SERIAL,
    "name" varchar NOT NULL,
    "email" varchar NOT NULL UNIQUE,
