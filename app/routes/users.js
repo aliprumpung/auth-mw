@@ -104,7 +104,7 @@ module.exports =  function(router, passport){
 									var name = newArray[0].name;
 									var host = req.get('host');
 									let encodedMail = new Buffer(mail).toString('base64');
-									let link="http://"+host+"/verify?_s="+encodedMail+"&id="+rand;
+									let link="http://"+host+"/users/signup/verify?_s="+encodedMail+"&id="+rand;
 									mailOptions={
 									from: "ALI PRUMPUNG <no-reply@aliprumpung.id>", 
 									to : mail,
@@ -114,6 +114,7 @@ module.exports =  function(router, passport){
 									
 									nodemailer.mail(mailOptions);
 									res.status(200).json({msg:'We have sent an email with a confirmation link to your email address. Please allow 5-10 minutes for this message to arrive.'});
+									// res.send('<a href='+link+'>Click here to verify</a>');
 									/*req.login(username , function(err) {
 
 										res.redirect('/users');
@@ -138,6 +139,57 @@ module.exports =  function(router, passport){
 
 });
 
+router.get('/signup/verify',function(req,res){
+	var rand = Math.floor((Math.random() * 100) + 54);
+	var host = req.get('host');
+
+	if((req.protocol+"://"+req.get('host'))==("http://"+host)){
+
+		console.log(req.query.id + ' - ' + rand);
+
+		
+		let email = new Buffer(req.query._s, 'base64').toString('ascii');
+
+
+		
+
+			var myObject = {users:[{email:email}]}
+
+			db.check_ifExistsInDB(myObject,'email',(err,pos)=>{
+				if ( pos[0].exists=== '1' && pos[0].rand === req.query.id){
+
+				var myObject1 ={
+					users: {
+						active: true,
+						where_AND:{
+							email:pos[0].email
+						}
+					}
+
+				}
+
+				var str_Results = db.exec_query(3,myObject1);
+
+				str_Results.then(rep=>{res.end("Email "+pos[0].email+" is been Successfully verified");}).catch(err=>{res.send({errMsg:err})});
+
+
+
+				}else{
+					res.end("<h3>Bad Request</h3>");
+				}
+
+
+			});
+
+		console.log("email is verified");
+
+		
+	}
+	else
+	{
+	res.end("Request is from unknown source");
+	}
+});
 
 
 

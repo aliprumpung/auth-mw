@@ -7,7 +7,6 @@ var social = require('../app/config/passport')(passport);
 const mw = require('../app/middleWare/index');
 var db = require('../app/config/db');
 var bcrypt = require('../app/config/bcrypt');
-const nodemailer = require('nodemailer');
 const saltRounds = 10;
 
 
@@ -190,111 +189,6 @@ router.get('/u',(req,res,next)=>{
 		res.status(500).json({msg:err.message});
 	});
 
-});
-
-router.get('/send',function(req,res){
-    rand=Math.floor((Math.random() * 100) + 54);
-    host=req.get('host');
-      let encodedMail = new Buffer('callmesike@gmail.com').toString('base64');
-      let link="http://"+req.get('host')+"/verify?_s="+encodedMail+"&id="+rand;
-    mailOptions={
-    	from: "ALI PRUMPUNG <no-reply@aliprumpung.id>", 
-        to : req.query.to,
-        subject : "Please confirm your Email account",
-        html : "Hello,<br> Please Click on the link to verify your email.<br><a href="+link+">Click here to verify</a>" 
-    }
-
-  
-	res.redirect(link);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  /*  smtpTransport.sendMail(mailOptions, function(error, response){
-     if(error){
-            console.log(error);
-        res.end("error");
-     }else{
-            console.log("Message sent: " + response.message);
-        res.end("sent");
-         }
-	});*/
-
-
-	//run on production mode only
-	// nodemailer.mail(mailOptions);
-	// res.redirect('/');
-
-
-
-
-
-});
-
-router.get('/verify',function(req,res){
-	var rand = Math.floor((Math.random() * 100) + 54);
-	var host = req.get('host');
-
-	if((req.protocol+"://"+req.get('host'))==("http://"+host)){
-
-		console.log(req.query.id + ' - ' + rand);
-
-		// console.log(req.protocol+":/"+req.get('host'));
-
-
-		let email = new Buffer(req.query._s, 'base64').toString('ascii');
-
-
-		
-
-			var myObject = {users:[{email:email}]}
-
-			db.check_ifExistsInDB(myObject,'email',(err,pos)=>{
-				if ( pos[0].exists=== '1' && pos[0].rand === req.query.id){
-
-				var myObject1 ={
-					users: {
-						active: true,
-						where_AND:{
-							email:pos[0].email
-						}
-					}
-
-				}
-
-				var str_Results = db.exec_query(3,myObject1);
-
-				str_Results.then(rep=>{res.end("<h1>Email "+pos[0].email+" is been Successfully verified");}).catch(err=>{res.send({errMsg:err})});
-
-
-
-				}else{
-					res.end("<h1>Bad Request</h1>");
-				}
-
-
-			});
-
-		console.log("email is verified");
-
-		
-	}
-	else
-	{
-	res.end("<h1>Request is from unknown source");
-	}
 });
 
 

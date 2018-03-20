@@ -402,16 +402,7 @@ exports.filter_JSON = (myObj,attr,str)=>{
   });
   return newArray;
 }
-exports.snfindOne = (id, callback)=>{
 
-var returningUser = false;
-var sql = 'SELECT * FROM users WHERE token = $1';
-    var data = [
-        id
-    ];
-
-
-}
 exports.create_sessionTbl = ()=>{
   const q =`CREATE TABLE IF NOT EXISTS "user_sessions" (
    "sid" varchar NOT NULL COLLATE "default",
