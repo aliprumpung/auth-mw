@@ -99,7 +99,7 @@ module.exports =  function(router, passport){
 
 
 
-						db.check_ifExistsInDB(myObject,'email',(err,pos)=>{
+						db.check_ifExistsInDB(myObject,'email','local',(err,pos)=>{
 
 							var result = {}
 							var rdup = db.removes_duplicatesJSON(pos);
@@ -189,7 +189,7 @@ module.exports =  function(router, passport){
 
 			var myObject = {users:[{email:email}]}
 
-			db.check_ifExistsInDB(myObject,'email',(err,pos)=>{
+			db.check_ifExistsInDB(myObject,'email','local',(err,pos)=>{
 				if ( pos[0].exists=== '1' && pos[0].rand === req.query.id){
 
 					var myObject1 ={

@@ -327,7 +327,7 @@ exports.ifDoesntExists = (tbl,condition)=>{
 
 
 
-exports.check_ifExistsInDB = (myObject,arg,cb)=>{
+exports.check_ifExistsInDB = (myObject,arg,arg1,cb)=>{
 
   let keys = '';   var results = [];
 
@@ -339,7 +339,7 @@ exports.check_ifExistsInDB = (myObject,arg,cb)=>{
    for (var y=0;y<myObject[item].length;y++){
 
 
-    var q=`${arg} = \'${myObject[item][y][arg]}\'`;
+    var q=`${arg} = \'${myObject[item][y][arg]}\' AND account_type = \'${arg1}\'`;
 
   
     this.ifExists(item,myObject[item][y],q).then(pos=>{
@@ -446,7 +446,7 @@ exports.create_usersTbl = ()=>{
   const q =`DROP TABLE IF EXISTS users;CREATE TABLE IF NOT EXISTS "users" (
    "u_id" SERIAL,
    "name" varchar NOT NULL,
-   "email" varchar NOT NULL UNIQUE,
+   "email" varchar NOT NULL ,
    "password" varchar NOT NULL,
    "account_type" varchar NOT NULL,
    "profile_id" varchar ,
@@ -455,7 +455,7 @@ exports.create_usersTbl = ()=>{
    "rand" varchar,
    "created_at" timestamp(6),
    "last_login" timestamp(6),
-   "shared_k" varchar
+   "shared_k" varchar UNIQUE
 )
 WITH (OIDS=FALSE);
 ALTER TABLE "users" ADD CONSTRAINT "users_pkey" PRIMARY KEY ("u_id") 

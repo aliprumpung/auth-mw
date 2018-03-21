@@ -54,7 +54,7 @@ module.exports = function(passport){
 			}
 			
 
-			db.check_ifExistsInDB(myObject,'email',(err,pos)=>{
+			db.check_ifExistsInDB(myObject,'email','facebook',(err,pos)=>{
 
 				var result = {}
 				var rdup = db.removes_duplicatesJSON(pos);
@@ -125,7 +125,7 @@ module.exports = function(passport){
 			}
 			
 
-			db.check_ifExistsInDB(myObject,'email',(err,pos)=>{
+			db.check_ifExistsInDB(myObject,'email','google',(err,pos)=>{
 
 				var result = {}
 				var rdup = db.removes_duplicatesJSON(pos);
@@ -175,7 +175,7 @@ module.exports = function(passport){
 			}]
 		}
 
-		db.check_ifExistsInDB(myObject,'email',(err,pos)=>{
+		db.check_ifExistsInDB(myObject,'email','local',(err,pos)=>{
 
 			
 
