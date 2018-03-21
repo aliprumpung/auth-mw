@@ -3,255 +3,255 @@
   const pg_ = new pg.Client(process.env.DATABASE_URL);
   const isEqual = require('lodash.isequal');
   pg_.connect();
- 
+  
 
 
 
   exports.exec_query = (opt,obj)=>{
 
-  var a='';
-  var items = Object.keys(obj);
-  items.forEach((item)=> {
+    var a='';
+    var items = Object.keys(obj);
+    items.forEach((item)=> {
 
-    if(opt === 1){
-      var create_query = this.create_query(item,obj[item]); 
-      a += create_query; 
+      if(opt === 1){
+        var create_query = this.create_query(item,obj[item]); 
+        a += create_query; 
 
-    }else if(opt === 2){
-      var create_query = this.insert_query(item,obj[item]); 
-      a += create_query; 
-    }else if(opt === 3){
-      var create_query = this.update_query(item,obj[item]); 
-      a += create_query; 
-    }else if(opt === 4){
-      var create_query = this.delete_query(item,obj[item]); 
-      a += create_query; 
-    }
-  });
-  return new Promise((resolve,reject)=>{
- 
-    pg_.query(a,(err,res)=>{
-      if(err){
-        reject(err);
-      }else{
-        resolve(obj);
+      }else if(opt === 2){
+        var create_query = this.insert_query(item,obj[item]); 
+        a += create_query; 
+      }else if(opt === 3){
+        var create_query = this.update_query(item,obj[item]); 
+        a += create_query; 
+      }else if(opt === 4){
+        var create_query = this.delete_query(item,obj[item]); 
+        a += create_query; 
       }
     });
+    return new Promise((resolve,reject)=>{
+     
+      pg_.query(a,(err,res)=>{
+        if(err){
+          reject(err);
+        }else{
+          resolve(obj);
+        }
+      });
 
-  });  
+    });  
 
     // return a;
 
- }
+  }
 
 
- exports.create_query = (tbl,myObject)=>{ 
-  var items = Object.keys(myObject);
-  var i=0, jsonkey ='', jsonval ='\'',q='';
+  exports.create_query = (tbl,myObject)=>{ 
+    var items = Object.keys(myObject);
+    var i=0, jsonkey ='', jsonval ='\'',q='';
 
-  items.forEach((item)=> {
-    if (i < Object.keys(myObject).length -1){
-      jsonkey += item + ' ' + myObject[item] + ',';
+    items.forEach((item)=> {
+      if (i < Object.keys(myObject).length -1){
+        jsonkey += item + ' ' + myObject[item] + ',';
 
-    }else{
-      jsonkey += item + ' ' + myObject[item];
-    }
-    i++;
+      }else{
+        jsonkey += item + ' ' + myObject[item];
+      }
+      i++;
 
-  });
+    });
 
-  q = `CREATE TABLE ${tbl} (${jsonkey});`;
-  return q;
-}
+    q = `CREATE TABLE ${tbl} (${jsonkey});`;
+    return q;
+  }
 
 
 
 
 
-exports.insert_query = (tbl,myObject)=>{ 
-  var items = Object.keys(myObject);
-  var i=0, jsonkey ='', jsonval ='\'';
+  exports.insert_query = (tbl,myObject)=>{ 
+    var items = Object.keys(myObject);
+    var i=0, jsonkey ='', jsonval ='\'';
 
-  items.forEach((item)=> {
-    if (i < Object.keys(myObject).length -1){
-      jsonkey += item + ',';
-      jsonval += myObject[item] + '\',\'';
-    }else{
-      jsonkey += item;
-      jsonval += myObject[item] +'\'';
-    }
-    i++;
+    items.forEach((item)=> {
+      if (i < Object.keys(myObject).length -1){
+        jsonkey += item + ',';
+        jsonval += myObject[item] + '\',\'';
+      }else{
+        jsonkey += item;
+        jsonval += myObject[item] +'\'';
+      }
+      i++;
 
-  });
-  var q = `insert into ${tbl} (${jsonkey}) values (${jsonval});`;
-  return q;
-}
+    });
+    var q = `insert into ${tbl} (${jsonkey}) values (${jsonval});`;
+    return q;
+  }
 
 
 
-exports.update_query = (tbl,myObject)=>{ 
-  var items = Object.keys(myObject);
-  var i=0, jsonkey ='', jsonval ='\'',q='',key_W_AND ='';
+  exports.update_query = (tbl,myObject)=>{ 
+    var items = Object.keys(myObject);
+    var i=0, jsonkey ='', jsonval ='\'',q='',key_W_AND ='';
 
-  items.forEach((item)=> {
-    if (Object.keys(myObject).length == 2){
-     
+    items.forEach((item)=> {
+      if (Object.keys(myObject).length == 2){
+       
 
-    if (i == 0){
-     
-      jsonkey += item + `= \'${myObject[item]}\' `;
+        if (i == 0){
+         
+          jsonkey += item + `= \'${myObject[item]}\' `;
 
-    }else
-    if (item == 'where_AND'){
+        }else
+        if (item == 'where_AND'){
 
-      key_W_AND = where_parse(myObject[item],'and');
+          key_W_AND = where_parse(myObject[item],'and');
 
-    }else
-    if (item == 'where_OR'){
+        }else
+        if (item == 'where_OR'){
 
-      key_W_AND = where_parse(myObject[item],'or');
+          key_W_AND = where_parse(myObject[item],'or');
 
-    }else
-    if (i < Object.keys(myObject).length -2){
-      jsonkey += item + ' = \'' + myObject[item] + '\', ';
-
-    }else{
-      jsonkey += item + ' = \'' + myObject[item] + '\'';
-    }
-
-
-
-
-    }else{
-
-      if (i == 0){
-     
-      jsonkey += item + `= \'${myObject[item]}\', `;
-
-    }else
-    if (item == 'where_AND'){
-
-      key_W_AND = where_parse(myObject[item],'and');
-
-    }else
-    if (item == 'where_OR'){
-
-      key_W_AND = where_parse(myObject[item],'or');
-
-    }else
-    if (i < Object.keys(myObject).length -2){
-      jsonkey += item + ' = \'' + myObject[item] + '\', ';
-
-    }else{
-      jsonkey += item + ' = \'' + myObject[item] + '\'';
-    }
-
-    }
-    
-    i++;
-
-  });
-
-  q = `UPDATE ${tbl} SET ${jsonkey} WHERE ${key_W_AND};`;
-  return q;
-}
-
-
-exports.delete_query = (tbl,myObject)=>{ 
-
-  var key_W_AND='';
-  var items = Object.keys(myObject);
-  var i=0, jsonkey ='', jsonval ='\'',q='';
-
-  items.forEach((item)=> {
-    if (item == 'where_AND'){
-
-      key_W_AND = where_parse(myObject[item],'and');
-
-    } else
-    if (item == 'where_OR'){
-
-      key_W_AND = where_parse(myObject[item],'or');
-
-    } else
-
-    if (i < Object.keys(myObject).length -1){
-      jsonkey += item + ' ' + myObject[item] + ',';
-
-    }else{
-      jsonkey += item + ' ' + myObject[item];
-    }
-    i++;
-
-  });
-
-  q = `DELETE FROM ${tbl} WHERE ${key_W_AND};`;
-  return q;
-
-}
-
-const where_parse = (obj,and_or)=>{
-
-  var key_W_AND='';
-  var w_obj = obj;
-  var j=0;
-
-  var items_where = Object.keys(w_obj);
-
-  items_where.forEach((item)=> {
-
-    if (j < Object.keys(w_obj).length -1){
-      key_W_AND += item + ' = \'' + w_obj[item] + `\' ${and_or} `;
-
-    }else{
-
-      key_W_AND += item + ' = \'' + w_obj[item] + '\'';
-    }
-    j++;
-  });
-
-  return key_W_AND;
-}
-
-
-exports.insert_multirows_json = (obj)=>{
-
-  var q='';
-  var items = Object.keys(obj);
-  items.forEach((item)=> {
-
-
-
-    var tbl = item;
-    for (var y=0;y<obj[item].length;y++){
-
-      var jsonkey ='';var jsonval ='\'';
-      var obj1 = obj[item][y];
-      var items1 = Object.keys(obj1);
-
-
-      var i=0;
-      items1.forEach((item1)=> {
-
-        if(i < items1.length -1){
-          jsonkey += item1 + `,`;
-          jsonval += obj1[item1] + '\',\'';
+        }else
+        if (i < Object.keys(myObject).length -2){
+          jsonkey += item + ' = \'' + myObject[item] + '\', ';
 
         }else{
-          jsonkey += item1 ;
-          jsonval += obj1[item1] + `\'`;
+          jsonkey += item + ' = \'' + myObject[item] + '\'';
         }
 
-        i++;
-      });
-
-      q +=`insert into ${tbl} (${jsonkey}) values (${jsonval});`;
-  
-
-    }
 
 
-  });
+
+      }else{
+
+        if (i == 0){
+         
+          jsonkey += item + `= \'${myObject[item]}\', `;
+
+        }else
+        if (item == 'where_AND'){
+
+          key_W_AND = where_parse(myObject[item],'and');
+
+        }else
+        if (item == 'where_OR'){
+
+          key_W_AND = where_parse(myObject[item],'or');
+
+        }else
+        if (i < Object.keys(myObject).length -2){
+          jsonkey += item + ' = \'' + myObject[item] + '\', ';
+
+        }else{
+          jsonkey += item + ' = \'' + myObject[item] + '\'';
+        }
+
+      }
+      
+      i++;
+
+    });
+
+    q = `UPDATE ${tbl} SET ${jsonkey} WHERE ${key_W_AND};`;
+    return q;
+  }
+
+
+  exports.delete_query = (tbl,myObject)=>{ 
+
+    var key_W_AND='';
+    var items = Object.keys(myObject);
+    var i=0, jsonkey ='', jsonval ='\'',q='';
+
+    items.forEach((item)=> {
+      if (item == 'where_AND'){
+
+        key_W_AND = where_parse(myObject[item],'and');
+
+      } else
+      if (item == 'where_OR'){
+
+        key_W_AND = where_parse(myObject[item],'or');
+
+      } else
+
+      if (i < Object.keys(myObject).length -1){
+        jsonkey += item + ' ' + myObject[item] + ',';
+
+      }else{
+        jsonkey += item + ' ' + myObject[item];
+      }
+      i++;
+
+    });
+
+    q = `DELETE FROM ${tbl} WHERE ${key_W_AND};`;
+    return q;
+
+  }
+
+  const where_parse = (obj,and_or)=>{
+
+    var key_W_AND='';
+    var w_obj = obj;
+    var j=0;
+
+    var items_where = Object.keys(w_obj);
+
+    items_where.forEach((item)=> {
+
+      if (j < Object.keys(w_obj).length -1){
+        key_W_AND += item + ' = \'' + w_obj[item] + `\' ${and_or} `;
+
+      }else{
+
+        key_W_AND += item + ' = \'' + w_obj[item] + '\'';
+      }
+      j++;
+    });
+
+    return key_W_AND;
+  }
+
+
+  exports.insert_multirows_json = (obj)=>{
+
+    var q='';
+    var items = Object.keys(obj);
+    items.forEach((item)=> {
+
+
+
+      var tbl = item;
+      for (var y=0;y<obj[item].length;y++){
+
+        var jsonkey ='';var jsonval ='\'';
+        var obj1 = obj[item][y];
+        var items1 = Object.keys(obj1);
+
+
+        var i=0;
+        items1.forEach((item1)=> {
+
+          if(i < items1.length -1){
+            jsonkey += item1 + `,`;
+            jsonval += obj1[item1] + '\',\'';
+
+          }else{
+            jsonkey += item1 ;
+            jsonval += obj1[item1] + `\'`;
+          }
+
+          i++;
+        });
+
+        q +=`insert into ${tbl} (${jsonkey}) values (${jsonval});`;
+        
+
+      }
+
+
+    });
  // return q;
 
  return new Promise((resolve,reject)=>{
@@ -274,7 +274,7 @@ exports.insert_multirows_json = (obj)=>{
 exports.ifExists = (tbl,obj,condition)=>{ 
 
   var q = `select * from ${tbl} where ${condition};`;
-   
+  
   var data = obj;
 
   return new Promise((resolve,reject)=>{
@@ -341,7 +341,7 @@ exports.check_ifExistsInDB = (myObject,arg,arg1,cb)=>{
 
     var q=`${arg} = \'${myObject[item][y][arg]}\' AND account_type = \'${arg1}\'`;
 
-  
+    
     this.ifExists(item,myObject[item][y],q).then(pos=>{
 
       results.push(pos);
@@ -422,14 +422,14 @@ exports.filter_JSON = (myObj,attr,str)=>{
 
 exports.create_sessionTbl = ()=>{
   const q =`CREATE TABLE IF NOT EXISTS "user_sessions" (
-   "sid" varchar NOT NULL COLLATE "default",
-   "sess" json NOT NULL,
-   "expire" timestamp(6) NOT NULL
-)
-WITH (OIDS=FALSE);
-ALTER TABLE "user_sessions" ADD CONSTRAINT "session_pkey" PRIMARY KEY ("sid") 
-NOT DEFERRABLE INITIALLY IMMEDIATE;`;
-return new Promise((resolve,reject)=>{
+  "sid" varchar NOT NULL COLLATE "default",
+  "sess" json NOT NULL,
+  "expire" timestamp(6) NOT NULL
+  )
+  WITH (OIDS=FALSE);
+  ALTER TABLE "user_sessions" ADD CONSTRAINT "session_pkey" PRIMARY KEY ("sid") 
+  NOT DEFERRABLE INITIALLY IMMEDIATE;`;
+  return new Promise((resolve,reject)=>{
     pg_.query(q,(err,res)=>{
       if(err){
         reject(err);
@@ -444,25 +444,25 @@ return new Promise((resolve,reject)=>{
 
 exports.create_usersTbl = ()=>{
   const q =`DROP TABLE IF EXISTS users;CREATE TABLE IF NOT EXISTS "users" (
-   "u_id" SERIAL,
-   "name" varchar NOT NULL,
-   "email" varchar NOT NULL ,
-   "password" varchar NOT NULL,
-   "account_type" varchar NOT NULL,
-   "profile_id" varchar ,
-   "token" varchar ,
-   "active" boolean,
-   "rand" varchar,
-   "created_at" timestamp(6),
-   "last_login" timestamp(6),
-   "shared_k" varchar UNIQUE
-)
-WITH (OIDS=FALSE);
-ALTER TABLE "users" ADD CONSTRAINT "users_pkey" PRIMARY KEY ("u_id") 
-NOT DEFERRABLE INITIALLY IMMEDIATE;
-ALTER TABLE "users" ALTER COLUMN active
-SET DEFAULT 'false';`;
-return new Promise((resolve,reject)=>{
+  "u_id" SERIAL,
+  "name" varchar NOT NULL,
+  "email" varchar NOT NULL ,
+  "password" varchar NOT NULL,
+  "account_type" varchar NOT NULL,
+  "profile_id" varchar ,
+  "token" varchar ,
+  "active" boolean,
+  "rand" varchar,
+  "created_at" timestamp(6),
+  "last_login" timestamp(6),
+  "shared_k" varchar UNIQUE
+  )
+  WITH (OIDS=FALSE);
+  ALTER TABLE "users" ADD CONSTRAINT "users_pkey" PRIMARY KEY ("u_id") 
+  NOT DEFERRABLE INITIALLY IMMEDIATE;
+  ALTER TABLE "users" ALTER COLUMN active
+  SET DEFAULT 'false';`;
+  return new Promise((resolve,reject)=>{
     pg_.query(q,(err,res)=>{
       if(err){
         reject(err);

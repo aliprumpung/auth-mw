@@ -10,7 +10,7 @@ module.exports =  function(router, passport){
 
 	router.get('/',mw.isAuthenticated, function(req, res, next) {
 		
-	res.render('index', { title: 'Hello from users', username:req.user.name});
+		res.render('index', { title: 'Hello from users', username:req.user.name});
 	});
 
 	router.get('/login',mw.middleWareAuth, function(req, res, next) {
@@ -125,13 +125,8 @@ module.exports =  function(router, passport){
 									}
 									
 									nodemailer.mail(mailOptions);
-									 res.render('signup', { title: 'Registration success',sent: [{msg:'We have sent an email with a confirmation link to your email address. Please allow 5-10 minutes for this message to arrived.'}],links:[{msg:link}]});
-									 // res.status(200).json({msg:'We have sent an email with a confirmation link to your email address. Please allow 5-10 minutes for this message to arrive.'});
-									// res.send('<a href='+link+'>Click here to verify</a>');
-									/*req.login(username , function(err) {
-
-										res.redirect('/users');
-									});*/
+									res.render('signup', { title: 'Registration success',sent: [{msg:'We have sent an email with a confirmation link to your email address. Please allow 5-10 minutes for this message to arrived.'}],links:[{msg:link}]});
+									 
 
 								}).catch(error=>{
 									// res.status(500).json({errMsg:error});
@@ -165,7 +160,7 @@ module.exports =  function(router, passport){
 			}).catch(err=>{ 
 				// res.status(500).json({errMsg:err}); 
 				res.render('signup', { title: 'Registration Error.',errors: [{msg:err.message}],username:req.session.username});
-		});
+			});
 
 
 
@@ -173,91 +168,91 @@ module.exports =  function(router, passport){
 
 	});
 
-	router.get('/signup/verify',function(req,res){
-		var rand = Math.floor((Math.random() * 100) + 54);
-		var host = req.get('host');
+router.get('/signup/verify',function(req,res){
+	var rand = Math.floor((Math.random() * 100) + 54);
+	var host = req.get('host');
 
-		if((req.protocol+"://"+req.get('host'))==("http://"+host)){
+	if((req.protocol+"://"+req.get('host'))==("http://"+host)){
 
-			console.log(req.query.id + ' - ' + rand);
-
-
-			let email = new Buffer(req.query._s, 'base64').toString('ascii');
+		console.log(req.query.id + ' - ' + rand);
 
 
+		let email = new Buffer(req.query._s, 'base64').toString('ascii');
 
 
-			var myObject = {users:[{email:email}]}
 
-			db.check_ifExistsInDB(myObject,'email','local',(err,pos)=>{
-				if ( pos[0].exists=== '1' && pos[0].rand === req.query.id){
 
-					var myObject1 ={
-						users: {
-							active: true,
-							where_AND:{
-								email:pos[0].email
-							}
+		var myObject = {users:[{email:email}]}
+
+		db.check_ifExistsInDB(myObject,'email','local',(err,pos)=>{
+			if ( pos[0].exists=== '1' && pos[0].rand === req.query.id){
+
+				var myObject1 ={
+					users: {
+						active: true,
+						where_AND:{
+							email:pos[0].email
 						}
-
 					}
 
-					var str_Results = db.exec_query(3,myObject1);
+				}
 
-					str_Results.then(rep=>{
-									var mail = pos[0].email;
-									var name = pos[0].name;
-									var host = req.get('host');
-									
-									mailOptions={
-										from: "ALI PRUMPUNG <no-reply@aliprumpung.id>", 
-										to : mail,
-										subject : "Registration success.",
-										html : "Dear " + name + " , Thank you for registering" 
-									}
-									
-									nodemailer.mail(mailOptions);
+				var str_Results = db.exec_query(3,myObject1);
+
+				str_Results.then(rep=>{
+					var mail = pos[0].email;
+					var name = pos[0].name;
+					var host = req.get('host');
+
+					mailOptions={
+						from: "ALI PRUMPUNG <no-reply@aliprumpung.id>", 
+						to : mail,
+						subject : "Registration success.",
+						html : "Dear " + name + " , Thank you for registering" 
+					}
+
+					nodemailer.mail(mailOptions);
 						// res.end("Email "+name+" is been Successfully verified");
 						req.login({email: email,name:name}, function(err) {
 
-										res.redirect('/');
-									});
+							res.redirect('/');
+						});
 					}).catch(err=>{res.send({errMsg:err})});
 
 
 
-				}else{
-					res.end("<h3>Bad Request</h3>");
-				}
+			}else{
+				res.end("<h3>Bad Request</h3>");
+			}
 
 
-			});
+		});
 
-			console.log("email is verified");
-
-
-		}
-		else
-		{
-			res.end("Request is from unknown source");
-		}
-	});
+		console.log("email is verified");
 
 
-
-
-	function timestamp(){
-		function pad(n) {return n<10 ? "0"+n : n}
-		d=new Date()
-		dash="-"
-		colon=":"
-		return d.getFullYear()+dash+
-		pad(d.getMonth()+1)+dash+
-		pad(d.getDate())+" "+
-		pad(d.getHours())+colon+
-		pad(d.getMinutes())+colon+
-		pad(d.getSeconds())
 	}
+	else
+	{
+		res.end("Request is from unknown source");
+	}
+});
+
+
+
+
+function timestamp(){
+	function pad(n) {return n<10 ? "0"+n : n}
+	d=new Date()
+	dash="-"
+	colon=":"
+	return d.getFullYear()+dash+
+	pad(d.getMonth()+1)+dash+
+	pad(d.getDate())+" "+
+	pad(d.getHours())+colon+
+	pad(d.getMinutes())+colon+
+	pad(d.getSeconds())
+}
 
 }
 
