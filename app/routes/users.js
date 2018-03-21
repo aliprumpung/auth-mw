@@ -9,7 +9,8 @@ module.exports =  function(router, passport){
 
 
 	router.get('/',mw.isAuthenticated, function(req, res, next) {
-		res.render('index', { title: 'express'});
+		
+	res.render('index', { title: 'Hello from users', username:req.user.name});
 	});
 
 	router.get('/login',mw.middleWareAuth, function(req, res, next) {
@@ -37,7 +38,7 @@ module.exports =  function(router, passport){
 	});
 
 	router.get('/signup', function(req, res, next) {
-		res.render('signup', { title: 'express'});
+		res.render('signup', { title: 'Registration form'});
 	});
 
 	router.post('/signup', (req, res, next)=> {
@@ -58,6 +59,7 @@ module.exports =  function(router, passport){
 			req.session.errors = errors;
 			req.session.success = false;
 			res.render('signup', { title: 'Registration Error.',errors: errors,username:req.session.username});
+
 
 		}else{
 			req.session.success = true;
@@ -108,7 +110,7 @@ module.exports =  function(router, passport){
 
 							if (Number(count) > 0){
 								result['users'] = newArray;
-								console.log(newArray);
+								
 								db.insert_multirows_json(result).then(pos=>{
 									var mail = newArray[0].email;
 									var name = newArray[0].name;
@@ -123,7 +125,8 @@ module.exports =  function(router, passport){
 									}
 									
 									nodemailer.mail(mailOptions);
-									 res.status(200).json({msg:'We have sent an email with a confirmation link to your email address. Please allow 5-10 minutes for this message to arrive.'});
+									 res.render('signup', { title: 'Registration success',sent: [{msg:'We have sent an email with a confirmation link to your email address. Please allow 5-10 minutes for this message to arrived.'}],links:[{msg:link}]});
+									 // res.status(200).json({msg:'We have sent an email with a confirmation link to your email address. Please allow 5-10 minutes for this message to arrive.'});
 									// res.send('<a href='+link+'>Click here to verify</a>');
 									/*req.login(username , function(err) {
 
@@ -131,11 +134,14 @@ module.exports =  function(router, passport){
 									});*/
 
 								}).catch(error=>{
-									res.status(500).json({errMsg:error});
+									// res.status(500).json({errMsg:error});
+									res.render('signup', { title: 'Registration Error.',errors: [{msg:error.message}],username:req.session.username});
 								});
 
 							}else{
-								res.status(500).json({errMsg:'Email already existed.'});
+								// res.status(500).json({errMsg:'Email already existed.'});
+								
+								res.render('signup', { title: 'Registration Error.',errors: [{msg:'Email already existed.'}],username:req.session.username});
 							}
 
 						});
@@ -149,13 +155,17 @@ module.exports =  function(router, passport){
 
 				}).catch(err=>{
 					console.log(err);
+					res.render('signup', { title: 'Registration Error.',errors: [{msg:err.message}],username:req.session.username});
 				});
 
 
 
 
 
-			}).catch(err=>{ res.status(500).json({errMsg:err}); });
+			}).catch(err=>{ 
+				// res.status(500).json({errMsg:err}); 
+				res.render('signup', { title: 'Registration Error.',errors: [{msg:err.message}],username:req.session.username});
+		});
 
 
 
@@ -207,7 +217,11 @@ module.exports =  function(router, passport){
 									}
 									
 									nodemailer.mail(mailOptions);
-						res.end("Email "+pos[0].email+" is been Successfully verified");
+						// res.end("Email "+name+" is been Successfully verified");
+						req.login({email: email,name:name}, function(err) {
+
+										res.redirect('/');
+									});
 					}).catch(err=>{res.send({errMsg:err})});
 
 

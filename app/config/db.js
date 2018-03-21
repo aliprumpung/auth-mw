@@ -285,6 +285,7 @@ exports.ifExists = (tbl,obj,condition)=>{
       }else{
 
         if(res.rows.length > 0){
+          data.name = res.rows[0].name;
           data.exists = '1';
           data.password = res.rows[0].password;
           data.active = res.rows[0].active;

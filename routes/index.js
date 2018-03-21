@@ -12,58 +12,60 @@ const saltRounds = 10;
 
 module.exports =  function(router, passport){
 
-router.get('/',mw.isAuthenticated, function(req, res, next) {
-res.send(req.user.email);
+	router.get('/',mw.isAuthenticated, function(req, res, next) {
+	// console.log(req.user.name);
+	res.render('index', { title: 'Home from index', username:req.user.name});
+
 
 });
 
 
-router.get('/create',(req,res,next)=>{
+	router.get('/create',(req,res,next)=>{
 
-	var myObject ={
-		users: {
-			id: 'SERIAL primary key',
-			email: 'text',
-			name: 'text',
-			password: 'text',
-			session: 'text'
-		},
-		facebook: {
-			id: 'SERIAL primary key',
-			email: 'text',
-			name: 'text',
-			session: 'text'
+		var myObject ={
+			users: {
+				id: 'SERIAL primary key',
+				email: 'text',
+				name: 'text',
+				password: 'text',
+				session: 'text'
+			},
+			facebook: {
+				id: 'SERIAL primary key',
+				email: 'text',
+				name: 'text',
+				session: 'text'
+			}
 		}
-	}
 
-	db.exec_query(1,myObject).then(pos=>{
-		res.status(200).json({message:pos});
-	}).catch(err=>{
-		res.status(409).json({errorMsg:err.message});
+		db.exec_query(1,myObject).then(pos=>{
+			res.status(200).json({message:pos});
+		}).catch(err=>{
+			res.status(409).json({errorMsg:err.message});
+		});
 	});
-});
 
 
-router.get('/insert_dupl',(req,res,next)=>{
+	router.get('/insert_dupl',(req,res,next)=>{
 
-	var myObject ={
-		users: [{
-			email: 'hayoo@gmail.com',
-			name: 'Joni',
-			password: '12432',
-			sesion: 'blablabla'
-		},{
-			email: 'yes@gmai.com',
-			name: 'jono',
-			password: '-098',
-			sesion: 'cjxklz'
-		},{
-			email: 'cihy@gmail.com',
-			name: 'jonoooo',
-			password: '489302',
-			sesion: 'ncxmee'
-		}]
-	}
+		var myObject ={
+			users: [{
+				email: 'hayoo@gmail.com',
+				name: 'Joni',
+				password: '12432',
+				sesion: 'blablabla'
+			},{
+				email: 'yes@gmai.com',
+				name: 'jono',
+				password: '-098',
+				sesion: 'cjxklz'
+			},{
+				email: 'cihy@gmail.com',
+				name: 'jonoooo',
+				password: '489302',
+				sesion: 'ncxmee'
+			}]
+		}
 
   // duplicatable way
   db.insert_multirows_json(myObject).then(pos=>{
@@ -77,16 +79,16 @@ router.get('/insert_dupl',(req,res,next)=>{
 
 
 
-router.get('/insert_nodupl',(req,res,next)=>{
-	
-var email = 'herokugit@gmail.com';
-var name = 'Ali';
-var password = 'hash1234567';
-var session = 'sss';
+	router.get('/insert_nodupl',(req,res,next)=>{
+		
+		var email = 'herokugit@gmail.com';
+		var name = 'Ali';
+		var password = 'hash1234567';
+		var session = 'sss';
 
-bcrypt.hashingPwd(password,saltRounds).then(hash=>{
-   
- 	
+		bcrypt.hashingPwd(password,saltRounds).then(hash=>{
+			
+			
 	// var myObject ={users: [{email: email,name: name,password: hash,sesion: session}]}
 	var myObject ={
 		users: [{
@@ -111,9 +113,9 @@ bcrypt.hashingPwd(password,saltRounds).then(hash=>{
 			result['users'] = newArray;
 
 			db.insert_multirows_json(result).then(pos=>{
-			res.status(200).json({status:'ok',message:'success..'});
+				res.status(200).json({status:'ok',message:'success..'});
 			}).catch(error=>{
-			res.status(500).json({errMsg:error});
+				res.status(500).json({errMsg:error});
 			});
 
 		}else{
@@ -126,70 +128,70 @@ bcrypt.hashingPwd(password,saltRounds).then(hash=>{
 }).catch(err=>{ res.status(500).json({errMsg:err}); });
 
 
-});
+	});
 
 
-router.get('/edit',(req,res,next)=>{
+	router.get('/edit',(req,res,next)=>{
 
-	var myObject ={
-		users: {
-			email: 'hes@gmail.com',
-			name: 'Ali Prumpung ',
-			password: '123245cccc6',
-			sesion: 'dddsss',
-			where_AND:{
-				email:'hes@gmail.com'
+		var myObject ={
+			users: {
+				email: 'hes@gmail.com',
+				name: 'Ali Prumpung ',
+				password: '123245cccc6',
+				sesion: 'dddsss',
+				where_AND:{
+					email:'hes@gmail.com'
+				}
+			}
+
+		}
+
+		db.exec_query(3,myObject).then(pos=>{
+			res.send(pos);
+		}).catch(err=>{
+			res.send(err);
+		});
+
+	});
+
+
+	router.get('/delete',(req,res,next)=>{
+
+		var myObject ={
+			users: {
+				where_OR:{
+					email:'jEje@gmail.com'
+				}
 			}
 		}
 
-	}
+		db.exec_query(4,myObject).then(pos=>{
+			res.send(pos);
+		}).catch(err=>{
+			res.send(err);
+		});
 
-	db.exec_query(3,myObject).then(pos=>{
-		res.send(pos);
-	}).catch(err=>{
-		res.send(err);
+
 	});
 
-});
+	router.get('/sess',(req,res,next)=>{
+		
+		db.create_sessionTbl().then(pos=>{
+			res.status(200).json({msg:'session table successfully created..'});
+		}).catch(err=>{
+			res.status(500).json({msg:err.message});
+		});
 
-
-router.get('/delete',(req,res,next)=>{
-
-	var myObject ={
-		users: {
-			where_OR:{
-				email:'jEje@gmail.com'
-			}
-		}
-	}
-
-	db.exec_query(4,myObject).then(pos=>{
-		res.send(pos);
-	}).catch(err=>{
-		res.send(err);
 	});
+	router.get('/u',(req,res,next)=>{
+		
+		db.create_usersTbl().then(pos=>{
+			res.status(200).json({msg:'users table successfully created..'});
+		}).catch(err=>{
+			res.status(500).json({msg:err.message});
+		});
 
-
-});
-
-router.get('/sess',(req,res,next)=>{
-	
-	db.create_sessionTbl().then(pos=>{
-		res.status(200).json({msg:'session table successfully created..'});
-	}).catch(err=>{
-		res.status(500).json({msg:err.message});
 	});
-
-});
-router.get('/u',(req,res,next)=>{
-	
-	db.create_usersTbl().then(pos=>{
-		res.status(200).json({msg:'users table successfully created..'});
-	}).catch(err=>{
-		res.status(500).json({msg:err.message});
-	});
-
-});
 
 
 

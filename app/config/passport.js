@@ -11,12 +11,12 @@ module.exports = function(passport){
 
 	
 	passport.serializeUser(function(user, done){
-		// console.log(user);
+		console.log('user: ' + user);
 		done(null, user);
 	});
 
 	passport.deserializeUser(function(id, done){
-		// console.log(id);
+		console.log('id: ' + id);
 		done(null, id);
 	});
 
@@ -33,57 +33,61 @@ module.exports = function(passport){
 	var fbCallback = (req,accessToken,refreshToken, profile, callback)=>{
 
 		var profile_id  = profile.id;
-        var token = accessToken;
-        var name  = profile.name.givenName + ' ' + profile.name.familyName; 
-        var email = profile.emails[0].value; 
-        var account_type = profile.provider;
-        
-        var reply;
-         process.nextTick(function(cb) {
-
-         	var myObject = {
-			users:[{
-				name:name,
-				email:email,
-				password:token,
-				account_type:account_type,
-				profile_id:profile_id,
-				token:token
-
-			}]
-		}
+		var token = accessToken;
+		var name  = profile.name.givenName + ' ' + profile.name.familyName; 
+		var email = profile.emails[0].value; 
+		var account_type = profile.provider;
 		
+		var reply;
+		process.nextTick(function(cb) {
 
-		db.check_ifExistsInDB(myObject,'email',(err,pos)=>{
+			var myObject = {
+				users:[{
+					name:name,
+					email:email,
+					password:token,
+					account_type:account_type,
+					profile_id:profile_id,
+					token:token
 
-						var result = {}
-						var rdup = db.removes_duplicatesJSON(pos);
-						var newArray = db.filter_JSON(rdup,'exists','0');
-						db.rem_attrFromJSON(newArray,'exists');
+				}]
+			}
+			
 
-						var count = newArray.length.toString();
+			db.check_ifExistsInDB(myObject,'email',(err,pos)=>{
 
-						if (Number(count) > 0){
-							result['users'] = newArray;
-							
-							db.insert_multirows_json(result).then(pos=>{
-								req.login(email , function(err) {
+				var result = {}
+				var rdup = db.removes_duplicatesJSON(pos);
+				var newArray = db.filter_JSON(rdup,'exists','0');
+				db.rem_attrFromJSON(newArray,'exists');
 
-									callback(null, {email:profile.emails[0].value});
-								});
-								
-								
-							}).catch(error=>{
-								callback(null, false);
-							});
+				var count = newArray.length.toString();
 
-						}else{
-							callback(null, {email:profile.emails[0].value});
-						}
+				if (Number(count) > 0){
+					result['users'] = newArray;
+					console.log(newArray);
+					
+					db.insert_multirows_json(result).then(pos=>{
+						req.login({name:name,email:email} , function(err) {
 
+							callback(null, {name:name,email:email});
+						});
+						
+						
+					}).catch(error=>{
+						callback(null, false);
 					});
 
-         });
+				}else{
+					req.login({name:name,email:email} , function(err) {
+
+						callback(null, {name:name,email:email});
+					});
+				}
+
+			});
+
+		});
 
 
 
@@ -100,57 +104,62 @@ module.exports = function(passport){
 
 
 		var profile_id  = profile.id;
-        var token = accessToken;
-        var name  = profile.name.givenName + ' ' + profile.name.familyName; 
-        var email = profile.emails[0].value; 
-        var account_type = profile.provider;
-        
-        var reply;
-         process.nextTick(function(cb) {
-
-         	var myObject = {
-			users:[{
-				name:name,
-				email:email,
-				password:token,
-				account_type:account_type,
-				profile_id:profile_id,
-				token:token
-
-			}]
-		}
+		var token = accessToken;
+		var name  = profile.name.givenName + ' ' + profile.name.familyName; 
+		var email = profile.emails[0].value; 
+		var account_type = profile.provider;
 		
+		var reply;
+		process.nextTick(function(cb) {
 
-		db.check_ifExistsInDB(myObject,'email',(err,pos)=>{
+			var myObject = {
+				users:[{
+					name:name,
+					email:email,
+					password:token,
+					account_type:account_type,
+					profile_id:profile_id,
+					token:token
 
-						var result = {}
-						var rdup = db.removes_duplicatesJSON(pos);
-						var newArray = db.filter_JSON(rdup,'exists','0');
-						db.rem_attrFromJSON(newArray,'exists');
+				}]
+			}
+			
 
-						var count = newArray.length.toString();
+			db.check_ifExistsInDB(myObject,'email',(err,pos)=>{
 
-						if (Number(count) > 0){
-							result['users'] = newArray;
-							
-							db.insert_multirows_json(result).then(pos=>{
-								req.login(email , function(err) {
+				var result = {}
+				var rdup = db.removes_duplicatesJSON(pos);
+				var newArray = db.filter_JSON(rdup,'exists','0');
+				db.rem_attrFromJSON(newArray,'exists');
 
-									callback(null, {email:profile.emails[0].value});
-								});
-								
-								
-							}).catch(error=>{
-								callback(null, false);
-							});
+				var count = newArray.length.toString();
 
-						}else{
-							callback(null, {email:profile.emails[0].value});
-						}
+				if (Number(count) > 0){
+					result['users'] = newArray;
+					
+					db.insert_multirows_json(result).then(pis=>{
+						
+						
+						req.login({email: email,name:name} , function(err) {
 
+							callback(null, {name:name,email:email});
+						});
+						
+						
+					}).catch(error=>{
+						callback(null, false);
 					});
 
-         });
+				}else{
+					req.login({email: email,name:name} , function(err) {
+
+						callback(null, {name:name,email:email});
+					});
+				}
+
+			});
+
+		});
 
 
 	}
@@ -168,15 +177,15 @@ module.exports = function(passport){
 
 		db.check_ifExistsInDB(myObject,'email',(err,pos)=>{
 
-			console.log(pos);
 			
-
 
 
 			if (Number(pos[0].exists) === 1 && pos[0].active === true){
 
 				bcrypt.compareRawPwdToHash(password,pos[0].password).then(reply=>{
-					return done(null,{email:pos[0].email});
+					var mail = pos[0].email;
+					var name = pos[0].name;
+					return done(null,{email:mail,name:name});
 				}).catch(err=>{
 					return done(null,false);
 				});
