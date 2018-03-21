@@ -43,7 +43,7 @@ app.use(expressValidator());
 app.use(session({
 		saveUninitialized:false,
     secret: process.env.FOO_COOKIE_SECRET,
-    store: new pgStore({ conString: process.env.DATABASE_URL,ttl:(1*5*5),tableName:'user_sessions'}),
+    store: new pgStore({ conString: process.env.DATABASE_URL,ttl:(1*60*60),tableName:'user_sessions'}),
     resave: false ,
     // cookie: { maxAge: 180 * 60 * 1000 },
     name: "id"
@@ -56,10 +56,10 @@ res.locals.isAuthenticated = req.isAuthenticated();
 next();
 });
 
-// app.use(function(req, res, next) {
-// res.locals.session = req.session;
-// next();
-// });
+app.use(function(req, res, next) {
+res.locals.session = req.session;
+next();
+});
 
 var auth = express.Router();
 require('./app/routes/auth')(auth, passport);

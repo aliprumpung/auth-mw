@@ -245,7 +245,7 @@
           i++;
         });
 
-        q +=`insert into ${tbl} (${jsonkey}) values (${jsonval});`;
+        q +=`insert into ${tbl} (${jsonkey}) values (${jsonval}) returning u_id;`;
         
 
       }
@@ -285,6 +285,7 @@ exports.ifExists = (tbl,obj,condition)=>{
       }else{
 
         if(res.rows.length > 0){
+          data.u_id = res.rows[0].u_id;
           data.name = res.rows[0].name;
           data.exists = '1';
           data.password = res.rows[0].password;
@@ -585,7 +586,25 @@ exports.create_usersTbl = ()=>{
 
 
 
+  sample ouput json
 
+  Array
+(
+    [diagnostic] => Array
+        (
+            [status] => 200
+            [elapsetime] => 0.1511
+            [memoryusage] => 16.46MB
+            [unix_timestamp] => 1521550678
+            [confirm] => success
+            [lang] => id
+            [currency] => IDR
+        )
+
+    [output_type] => array
+    [login_status] => false
+    [token] => 32a8b4af283dae58c4e37a98763c84e1f16c6a53
+)
 
 
 

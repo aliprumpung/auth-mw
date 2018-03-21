@@ -14,7 +14,7 @@ module.exports =  function(router, passport){
 
 	router.get('/',mw.isAuthenticated, function(req, res, next) {
 	// console.log(req.user.name);
-	res.render('index', { title: 'Home from index', username:req.user.name});
+	res.render('index', { title: 'Home from index', userid:req.user.id});
 
 
 });

@@ -11,12 +11,12 @@ module.exports = function(passport){
 
 	
 	passport.serializeUser(function(user, done){
-		console.log('user: ' + user);
+		// console.log('user: ' + user);
 		done(null, user);
 	});
 
 	passport.deserializeUser(function(id, done){
-		console.log('id: ' + id);
+		// console.log('id: ' + id);
 		done(null, id);
 	});
 
@@ -55,6 +55,7 @@ module.exports = function(passport){
 			
 
 			db.check_ifExistsInDB(myObject,'email','facebook',(err,pos)=>{
+				var u_id = pos[0].u_id;
 
 				var result = {}
 				var rdup = db.removes_duplicatesJSON(pos);
@@ -65,12 +66,14 @@ module.exports = function(passport){
 
 				if (Number(count) > 0){
 					result['users'] = newArray;
-					console.log(newArray);
 					
-					db.insert_multirows_json(result).then(pos=>{
-						req.login({name:name,email:email} , function(err) {
+					
+					db.insert_multirows_json(result).then(rep=>{
+						var u_id = rep.rows[0].u_id;
+						
+						req.login({id:u_id} , function(err) {
 
-							callback(null, {name:name,email:email});
+							callback(null,{id:u_id});
 						});
 						
 						
@@ -79,10 +82,10 @@ module.exports = function(passport){
 					});
 
 				}else{
-					req.login({name:name,email:email} , function(err) {
+					req.login({id:u_id} , function(err) {
 
-						callback(null, {name:name,email:email});
-					});
+							callback(null, {id:u_id});
+						});
 				}
 
 			});
@@ -126,7 +129,7 @@ module.exports = function(passport){
 			
 
 			db.check_ifExistsInDB(myObject,'email','google',(err,pos)=>{
-
+				var u_id = pos[0].u_id;
 				var result = {}
 				var rdup = db.removes_duplicatesJSON(pos);
 				var newArray = db.filter_JSON(rdup,'exists','0');
@@ -137,12 +140,12 @@ module.exports = function(passport){
 				if (Number(count) > 0){
 					result['users'] = newArray;
 					
-					db.insert_multirows_json(result).then(pis=>{
+					db.insert_multirows_json(result).then(rep=>{
 						
-						
-						req.login({email: email,name:name} , function(err) {
+						var u_id = rep.rows[0].u_id;
+						req.login({id:u_id} , function(err) {
 
-							callback(null, {name:name,email:email});
+							callback(null, {id:u_id});
 						});
 						
 						
@@ -151,10 +154,10 @@ module.exports = function(passport){
 					});
 
 				}else{
-					req.login({email: email,name:name} , function(err) {
+					req.login({id:u_id} , function(err) {
 
-						callback(null, {name:name,email:email});
-					});
+							callback(null, {id:u_id});
+						});
 				}
 
 			});
@@ -177,7 +180,7 @@ module.exports = function(passport){
 
 		db.check_ifExistsInDB(myObject,'email','local',(err,pos)=>{
 
-			
+			var u_id = pos[0].u_id;
 
 
 			if (Number(pos[0].exists) === 1 && pos[0].active === true){
@@ -185,7 +188,7 @@ module.exports = function(passport){
 				bcrypt.compareRawPwdToHash(password,pos[0].password).then(reply=>{
 					var mail = pos[0].email;
 					var name = pos[0].name;
-					return done(null,{email:mail,name:name});
+					return done(null,{id:u_id});
 				}).catch(err=>{
 					return done(null,false);
 				});

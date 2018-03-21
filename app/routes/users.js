@@ -10,7 +10,7 @@ module.exports =  function(router, passport){
 
 	router.get('/',mw.isAuthenticated, function(req, res, next) {
 		
-		res.render('index', { title: 'Hello from users', username:req.user.name});
+		res.render('index', { title: 'Home from index', userid:req.user.id});
 	});
 
 	router.get('/login',mw.middleWareAuth, function(req, res, next) {
@@ -55,7 +55,7 @@ module.exports =  function(router, passport){
 		var errors = req.validationErrors();
 
 		if(errors){
-			console.log(`errors: ${JSON.stringify(errors)}`)
+			// console.log(`errors: ${JSON.stringify(errors)}`)
 			req.session.errors = errors;
 			req.session.success = false;
 			res.render('signup', { title: 'Registration Error.',errors: errors,username:req.session.username});
@@ -149,7 +149,7 @@ module.exports =  function(router, passport){
 					}
 
 				}).catch(err=>{
-					console.log(err);
+					// console.log(err);
 					res.render('signup', { title: 'Registration Error.',errors: [{msg:err.message}],username:req.session.username});
 				});
 
@@ -174,7 +174,7 @@ router.get('/signup/verify',function(req,res){
 
 	if((req.protocol+"://"+req.get('host'))==("http://"+host)){
 
-		console.log(req.query.id + ' - ' + rand);
+		//console.log(req.query.id + ' - ' + rand);
 
 
 		let email = new Buffer(req.query._s, 'base64').toString('ascii');
@@ -200,6 +200,7 @@ router.get('/signup/verify',function(req,res){
 				var str_Results = db.exec_query(3,myObject1);
 
 				str_Results.then(rep=>{
+					var u_id = pos[0].u_id;
 					var mail = pos[0].email;
 					var name = pos[0].name;
 					var host = req.get('host');
@@ -213,7 +214,7 @@ router.get('/signup/verify',function(req,res){
 
 					nodemailer.mail(mailOptions);
 						// res.end("Email "+name+" is been Successfully verified");
-						req.login({email: email,name:name}, function(err) {
+						req.login({id:u_id}, function(err) {
 
 							res.redirect('/');
 						});
