@@ -1,0 +1,79 @@
+
+<div class="container">
+<div class="col-sm-6 col-sm-offset-3">
+<h3><span class="fa fa-sign-in"></span> User's Profile</h3>
+<form ng-submit="submit(account)">
+
+
+
+		<div class="form-group">
+			<label>Email</label>
+			<input type="text" class="form-control" name="email" ng-model="account.email">
+			<input type="hidden" class="form-control" name="u_id" ng-model="account.u_id">
+		</div>
+		<div class="form-group">
+			<label>Name</label>
+			<input type="text" class="form-control" name="username" value="" ng-model="account.name">
+		</div>
+		<div class="form-group">
+			<label>Password</label>
+			<input type="password" class="form-control" name="password" value="" ng-model="account.password">
+		</div>
+
+
+
+
+		<div class="form-group">
+			<label>Account-type</label>
+			<input class="form-control" type="text" class="form-control" name="title" ng-model="account.account_type" >
+		</div>
+
+			
+		<div class="form-group">
+			<!-- <label>Profile picture</label> -->
+        	<input class="form-control" type="file" name="file1" id="file1" style="display: none" />
+    	</div>
+    	
+
+    	<div class="form-group">
+			<label>Profile picture</label>
+        	<img class="form-control" id="imgpreview" src="#"/>
+
+    	</div>
+    	
+    	<button type="submit" class="btn btn-primary" name="submit" id="btnSubmit">Submit</button>
+        
+</form>
+
+<br>
+<div class="container-fluid">
+
+<div class="jumbotron text-center" ng-show="register.loading">
+	
+<span class="glyphicon glyphicon-repeat spinner"></span>
+<p>Loading...</p>
+
+</div>
+
+<br>
+<div class="form-group" ng-show="register.successMsg">
+	<div class="alert alert-success">{{register.successMsg}}</div>
+</div>
+
+<br>
+
+<div class="form-group" ng-show="register.errorMsg">
+	<div class="alert alert-danger">{{register.errorMsg}}</div>
+</div>
+
+
+
+</div>
+
+
+
+
+</div>
+</div>
+
+

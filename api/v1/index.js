@@ -2,7 +2,7 @@
 	var router = express.Router();
 	const Mw = require('./mw/jwt');
 	const Ctrl = require('./controllers/index');
-	var bcrypt = require('../../app/config/bcrypt');
+	var bcrypt = require('../../back-end/auth/bcrypt');
 	var randtoken = require('rand-token');
 
 	//GET http://localhost:3000/checkauth?token= <Your_Token here>

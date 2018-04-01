@@ -1,0 +1,57 @@
+
+ 
+
+<div class="container">
+<div class="col-sm-6 col-sm-offset-3">
+<h3><span class="fa fa-sign-in"></span> Registration Form</h3>
+
+
+
+
+	
+
+<div class="jumbotron text-center" ng-show="register.loading">
+	
+<span class="glyphicon glyphicon-repeat spinner"></span>
+<p>Loading...</p>
+
+</div>
+
+<br>
+<div class="form-group" ng-show="register.successMsg">
+	<div class="alert alert-success">{{register.successMsg}}</div>
+</div>
+<br>
+<div class="form-group" ng-show="register.errorMsg">
+	<div class="alert alert-danger">{{register.errorMsg}}</div>
+</div>
+
+
+<form ng-submit="register.regUser(register.regData);">
+		<div class="form-group">
+			<label>Email</label>
+			<input type="text" class="form-control" name="email" ng-model="register.regData.email">
+		</div>
+		<div class="form-group">
+			<label>Name</label>
+			<input type="text" class="form-control" name="username" value="" ng-model="register.regData.username">
+		</div>
+		<div class="form-group">
+			<label>Password</label>
+			<input type="password" class="form-control" name="password" value="" ng-model="register.regData.password">
+		</div>
+		<div class="form-group">
+			<label>Re-Enter Password</label>
+			<input type="password" name="passwordMatch" class="form-control" value="" ng-model="register.regData.passwordMatch">
+		</div>
+		
+		<button type="submit" class="btn btn-primary">Signup</button>
+</form>
+
+
+
+
+<!-- aaaaaaaaaaaaaa -->
+
+</div>
+</div>

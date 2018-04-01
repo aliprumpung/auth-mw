@@ -1,0 +1,1 @@
+angular.module('auth-mw',['appRoutes','userControllers','userServices','ngAnimate']);

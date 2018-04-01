@@ -1,0 +1,48 @@
+
+<div class="container">
+
+    <div class="page-header text-center">
+        <h1><span class="fa fa-anchor"></span> Profile Page</h1>
+        <a href="/users/logout" class="btn btn-default btn-sm">Logout</a>
+    </div>
+
+    <div class="row">
+
+        <!-- LOCAL INFORMATION -->
+        <div class="col-sm-6">
+            <div class="well">
+                <h3><span class="fa fa-user"></span> User Details</h3>
+
+
+                <p>
+                    <strong>id</strong>: {{user.u_id}}<br>
+
+                    <strong>name</strong>: {{user.name}}<br>
+                    <strong>email</strong>: {{user.email}}<br>
+                    <strong>account type</strong>: {{user.account_type}}
+                </p>
+            </div>
+        </div>
+
+
+        
+
+    </div>
+
+    <div>
+        <div class="well">
+            <h3><span class="fa fa-user"></span> Display Photos</h3>
+            <strong>photos</strong>: <br>
+            <div class = "row">
+
+                <!-- <% photos.forEach(function(photo) { %>
+                <img style="width: 300px; height: 200px" src = '<%= photo.filepath %>'/>
+                <% }); %> -->
+
+            </div>
+
+        </div>
+    </div>
+
+
+</div>

@@ -6,6 +6,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var passport = require('passport');//social auth
+var social = require('./back-end/auth/passport')(passport);
 var expressValidator = require('express-validator');
 var pg = require('pg');
 var session = require('express-session');
@@ -13,7 +14,8 @@ var pgStore = require('connect-pg-simple')(session);
 var LocalStrategy = require('passport-local').Strategy
 var bcrypt = require('bcrypt');
 var jwt = require('jsonwebtoken');
-
+const cors = require('cors');
+const fileupload = require('express-fileupload');
 
 // var index = require('./routes/index');
 
@@ -21,7 +23,7 @@ var jwt = require('jsonwebtoken');
 var app = express();
 
 // view engine setup
-app.set('views', path.join(__dirname, 'views'));
+app.set('views', path.join(__dirname, '/front-end/app/views'));
 app.set('view engine', 'hbs');
 
 // uncomment after placing your favicon in /public
@@ -29,13 +31,15 @@ app.set('view engine', 'hbs');
 app.use(logger('dev'));
 app.use(bodyParser.json());
 
-
-
-
+/*app.use(fileupload({
+  limits:{ fileSize:50*100*100 }
+}));*/
+app.use(cors());
 
 app.use(bodyParser.urlencoded({ extended: false }));
+
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'front-end')));
 
 /*-------Passport Configuration------*/
 
@@ -61,17 +65,21 @@ res.locals.session = req.session;
 next();
 });
 
+var index = express.Router();
+require('./back-end/routes/index')(index, passport);
+app.use('/', index);
+
 var auth = express.Router();
-require('./app/routes/auth')(auth, passport);
+require('./back-end/routes/auth')(auth, passport);
 app.use('/auth', auth);
 
 var users = express.Router();
-require('./app/routes/users')(users, passport);
+require('./back-end/routes/users')(users, passport);
 app.use('/users', users);
 
-var index = express.Router();
-require('./routes/index')(index, passport);
-app.use('/', index);
+var account = express.Router();
+require('./back-end/routes/account')(account, passport);
+app.use('/account', account);
 
 
 /*-------Passport Configuration------*/

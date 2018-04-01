@@ -1,0 +1,30 @@
+
+<div class="container">
+			<div class="col-sm-6 col-sm-offset-3">
+				<h3><span class="fa fa-sign-in"></span> Login</h3>
+				<!-- show any messages that come back with authentication -->
+				<form action="/users/login" method="post">
+					<div class="form-group">
+						<label>Email</label>
+						<input type="text" class="form-control" name="username">
+					</div>
+					<div class="form-group">
+						<label>Password</label>
+						<input type="password" class="form-control" name="password" >
+					</div>
+					<button type="submit" class="btn btn-warning btn-lg">Login</button>
+				</form>
+				<hr>
+				<p>Need an account? <a target="_self" href="/users/signup">Signup</a></p>
+			</div>
+		</div>
+</div>
+<div class="container">
+			<div class="col-sm-6 col-sm-offset-3">
+				<p><a href="/auth/connect/facebook" class="btn btn-primary"><span class="fa fa-facebook"></span> Facebook</a></p>
+		<p><a href="/auth/connect/google" class="btn btn-danger"><span class="fa fa-google-plus"></span> Google</a></p>
+			</div>
+		</div>
+	
+		
+</div>
